@@ -74,23 +74,25 @@ export default function SettingsPage() {
                       <Button size="icon" variant="ghost" onClick={() => { setEditingId(cat.id); setEditName(cat.name); setEditEmoji(cat.emoji || ''); }}>
                         <Pencil className="h-3.5 w-3.5" />
                       </Button>
-                      {!cat.is_default && (
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button size="icon" variant="ghost"><Trash2 className="h-3.5 w-3.5" /></Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Categorie verwijderen?</AlertDialogTitle>
-                              <AlertDialogDescription>Items in deze categorie moeten eerst verplaatst worden.</AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Annuleren</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => deleteCategory.mutate(cat.id)}>Verwijderen</AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      )}
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button size="icon" variant="ghost" className="text-destructive hover:text-destructive hover:bg-destructive/10">
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Categorie verwijderen?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Weet je het zeker? Items in deze categorie worden niet verwijderd, maar krijgen geen categorie meer toegewezen.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Annuleren</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => deleteCategory.mutate(cat.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Verwijderen</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </>
                 )}
