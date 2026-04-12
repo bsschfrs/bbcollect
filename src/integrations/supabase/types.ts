@@ -49,7 +49,7 @@ export type Database = {
       }
       collection_items: {
         Row: {
-          category_id: string
+          category_id: string | null
           condition: Database["public"]["Enums"]["item_condition"] | null
           created_at: string
           id: string
@@ -64,7 +64,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          category_id: string
+          category_id?: string | null
           condition?: Database["public"]["Enums"]["item_condition"] | null
           created_at?: string
           id?: string
@@ -79,7 +79,7 @@ export type Database = {
           user_id: string
         }
         Update: {
-          category_id?: string
+          category_id?: string | null
           condition?: Database["public"]["Enums"]["item_condition"] | null
           created_at?: string
           id?: string
