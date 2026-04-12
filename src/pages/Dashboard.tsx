@@ -7,9 +7,7 @@ import { DollarSign, Package, Heart, Trophy } from 'lucide-react';
 
 export default function Dashboard() {
   const { data: allItems = [] } = useCollectionItems();
-  const { data: categories = [], seedDefaults } = useCategories();
-
-  const { isSuccess: categoriesLoaded } = useCategories();
+  const { data: categories = [], seedDefaults, isSuccess: categoriesLoaded } = useCategories();
 
   // Seed default categories on first load (only after query has resolved)
   useEffect(() => {
