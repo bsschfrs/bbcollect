@@ -34,6 +34,13 @@ export function useCategories() {
   const seedDefaults = useMutation({
     mutationFn: async () => {
       if (!user) throw new Error('Not authenticated');
+      // Check if user already has categories before seeding
+      const { data: existing } = await supabase
+        .from('categories')
+        .select('id')
+        .eq('user_id', user.id)
+        .limit(1);
+      if (existing && existing.length > 0) return;
       const inserts = DEFAULT_CATEGORIES.map(c => ({
         user_id: user.id,
         name: c.name,

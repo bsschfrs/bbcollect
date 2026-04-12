@@ -9,12 +9,14 @@ export default function Dashboard() {
   const { data: allItems = [] } = useCollectionItems();
   const { data: categories = [], seedDefaults } = useCategories();
 
-  // Seed default categories on first load
+  const { isSuccess: categoriesLoaded } = useCategories();
+
+  // Seed default categories on first load (only after query has resolved)
   useEffect(() => {
-    if (categories.length === 0 && !seedDefaults.isPending) {
+    if (categoriesLoaded && categories.length === 0 && !seedDefaults.isPending && !seedDefaults.isSuccess) {
       seedDefaults.mutate();
     }
-  }, [categories.length]);
+  }, [categoriesLoaded, categories.length, seedDefaults.isPending, seedDefaults.isSuccess]);
 
   const collectionItems = allItems.filter(i => i.status === 'collection');
   const wishlistItems = allItems.filter(i => i.status === 'wishlist');
