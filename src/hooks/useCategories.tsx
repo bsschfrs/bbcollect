@@ -4,6 +4,7 @@ import { useAuth } from './useAuth';
 
 const DEFAULT_CATEGORIES = [
   { name: 'Pokémon Cards', emoji: '🃏' },
+  { name: 'Pokémon Elite Trainer Boxes', emoji: '📦' },
   { name: 'Pokémon Games', emoji: '🎮' },
   { name: 'Vinyl Records', emoji: '🎵' },
   { name: 'Game Consoles', emoji: '🕹️' },
