@@ -14,7 +14,95 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      categories: {
+        Row: {
+          created_at: string
+          emoji: string | null
+          id: string
+          is_default: boolean
+          is_hidden: boolean
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          emoji?: string | null
+          id?: string
+          is_default?: boolean
+          is_hidden?: boolean
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          emoji?: string | null
+          id?: string
+          is_default?: boolean
+          is_hidden?: boolean
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      collection_items: {
+        Row: {
+          category_id: string
+          condition: Database["public"]["Enums"]["item_condition"] | null
+          created_at: string
+          id: string
+          image_url: string | null
+          name: string
+          notes: string | null
+          priority: Database["public"]["Enums"]["wishlist_priority"] | null
+          purchase_date: string | null
+          purchase_price: number | null
+          status: Database["public"]["Enums"]["item_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category_id: string
+          condition?: Database["public"]["Enums"]["item_condition"] | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          name: string
+          notes?: string | null
+          priority?: Database["public"]["Enums"]["wishlist_priority"] | null
+          purchase_date?: string | null
+          purchase_price?: number | null
+          status?: Database["public"]["Enums"]["item_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category_id?: string
+          condition?: Database["public"]["Enums"]["item_condition"] | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          name?: string
+          notes?: string | null
+          priority?: Database["public"]["Enums"]["wishlist_priority"] | null
+          purchase_date?: string | null
+          purchase_price?: number | null
+          status?: Database["public"]["Enums"]["item_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collection_items_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +111,9 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      item_condition: "mint" | "near_mint" | "good" | "fair" | "poor"
+      item_status: "collection" | "wishlist"
+      wishlist_priority: "low" | "medium" | "high"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +240,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      item_condition: ["mint", "near_mint", "good", "fair", "poor"],
+      item_status: ["collection", "wishlist"],
+      wishlist_priority: ["low", "medium", "high"],
+    },
   },
 } as const
