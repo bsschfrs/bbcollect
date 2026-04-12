@@ -1,0 +1,125 @@
+import { useState, useMemo } from 'react';
+import { useCollectionItems } from '@/hooks/useCollectionItems';
+import { useCategories } from '@/hooks/useCategories';
+import ItemCard from '@/components/ItemCard';
+import ItemFormDialog from '@/components/ItemFormDialog';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { Search, LayoutGrid, List, Package } from 'lucide-react';
+
+export default function Collection() {
+  const { data: items = [], isLoading } = useCollectionItems();
+  const { data: categories = [] } = useCategories();
+  const [search, setSearch] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [conditionFilter, setConditionFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('created_at');
+  const [view, setView] = useState<'grid' | 'list'>('grid');
+  const [editItem, setEditItem] = useState<any>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const filtered = useMemo(() => {
+    let result = items;
+    if (search) {
+      const q = search.toLowerCase();
+      result = result.filter(i => i.name.toLowerCase().includes(q) || i.notes?.toLowerCase().includes(q));
+    }
+    if (categoryFilter !== 'all') result = result.filter(i => i.category_id === categoryFilter);
+    if (conditionFilter !== 'all') result = result.filter(i => i.condition === conditionFilter);
+    if (statusFilter !== 'all') result = result.filter(i => i.status === statusFilter);
+
+    result = [...result].sort((a, b) => {
+      switch (sortBy) {
+        case 'name': return a.name.localeCompare(b.name);
+        case 'price': return (b.purchase_price || 0) - (a.purchase_price || 0);
+        case 'purchase_date': return (b.purchase_date || '').localeCompare(a.purchase_date || '');
+        default: return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      }
+    });
+    return result;
+  }, [items, search, categoryFilter, conditionFilter, statusFilter, sortBy]);
+
+  const visibleCategories = categories.filter(c => !c.is_hidden);
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">Mijn Collectie</h1>
+        <p className="text-muted-foreground">{items.length} items in totaal</p>
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-wrap gap-3">
+        <div className="relative flex-1 min-w-[200px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input placeholder="Zoeken..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9" />
+        </div>
+        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+          <SelectTrigger className="w-[180px]"><SelectValue placeholder="Categorie" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Alle categorieën</SelectItem>
+            {visibleCategories.map(c => (
+              <SelectItem key={c.id} value={c.id}>{c.emoji} {c.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-[150px]"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Alles</SelectItem>
+            <SelectItem value="collection">In Collectie</SelectItem>
+            <SelectItem value="wishlist">Wishlist</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={sortBy} onValueChange={setSortBy}>
+          <SelectTrigger className="w-[150px]"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="created_at">Nieuwste</SelectItem>
+            <SelectItem value="name">Naam</SelectItem>
+            <SelectItem value="price">Prijs</SelectItem>
+            <SelectItem value="purchase_date">Aankoopdatum</SelectItem>
+          </SelectContent>
+        </Select>
+        <div className="flex rounded-lg border border-border overflow-hidden">
+          <Button variant={view === 'grid' ? 'default' : 'ghost'} size="icon" onClick={() => setView('grid')} className="rounded-none">
+            <LayoutGrid className="h-4 w-4" />
+          </Button>
+          <Button variant={view === 'list' ? 'default' : 'ghost'} size="icon" onClick={() => setView('list')} className="rounded-none">
+            <List className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Items */}
+      {isLoading ? (
+        <div className="flex justify-center py-12">
+          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <Package className="h-12 w-12 text-muted-foreground/40 mb-4" />
+          <h3 className="text-lg font-semibold text-foreground">Geen items gevonden</h3>
+          <p className="text-sm text-muted-foreground mt-1">
+            {items.length === 0 ? 'Begin met het toevoegen van items!' : 'Probeer andere filters.'}
+          </p>
+        </div>
+      ) : view === 'grid' ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          {filtered.map(item => (
+            <ItemCard key={item.id} item={item as any} view="grid" onClick={() => { setEditItem(item); setDialogOpen(true); }} />
+          ))}
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {filtered.map(item => (
+            <ItemCard key={item.id} item={item as any} view="list" onClick={() => { setEditItem(item); setDialogOpen(true); }} />
+          ))}
+        </div>
+      )}
+
+      <ItemFormDialog open={dialogOpen} onOpenChange={o => { setDialogOpen(o); if (!o) setEditItem(null); }} editItem={editItem} />
+    </div>
+  );
+}
