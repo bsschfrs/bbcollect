@@ -79,9 +79,9 @@ export default function ItemCard({ item, view = 'grid', onClick }: ItemCardProps
       <CardContent className="p-3">
         <p className="text-sm font-semibold text-foreground truncate">{item.name}</p>
         <p className="text-xs text-muted-foreground mt-0.5">{item.categories?.emoji} {item.categories?.name}</p>
-        {item.purchase_price != null && (
-          <p className="text-sm font-bold text-primary mt-1">€{item.purchase_price.toFixed(2)}</p>
-        )}
+        <p className="text-sm font-bold text-primary mt-1">
+          {item.purchase_price != null ? `€${item.purchase_price.toFixed(2)}` : '—'}
+        </p>
       </CardContent>
     </Card>
   );

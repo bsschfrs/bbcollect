@@ -18,7 +18,7 @@ export default function Dashboard() {
 
   const collectionItems = allItems.filter(i => i.status === 'collection');
   const wishlistItems = allItems.filter(i => i.status === 'wishlist');
-  const totalInvested = collectionItems.reduce((sum, i) => sum + (i.purchase_price || 0), 0);
+  const totalInvested = collectionItems.reduce((sum, i) => sum + (i.purchase_price ?? 0), 0);
 
   const wishlisScored = wishlistItems.length > 0
     ? Math.round((collectionItems.length / (collectionItems.length + wishlistItems.length)) * 100)
