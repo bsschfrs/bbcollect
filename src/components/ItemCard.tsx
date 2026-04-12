@@ -48,9 +48,9 @@ export default function ItemCard({ item, view = 'grid', onClick }: ItemCardProps
             <p className="text-xs text-muted-foreground">{item.categories?.emoji} {item.categories?.name}</p>
           </div>
           <div className="text-right flex-shrink-0">
-            {item.purchase_price != null && (
-              <p className="text-sm font-semibold text-foreground">€{item.purchase_price.toFixed(2)}</p>
-            )}
+            <p className="text-sm font-semibold text-foreground">
+              {item.purchase_price != null ? `€${item.purchase_price.toFixed(2)}` : '—'}
+            </p>
             {item.condition && (
               <Badge variant="secondary" className="text-[10px] mt-1">{conditionLabels[item.condition] || item.condition}</Badge>
             )}
@@ -79,9 +79,9 @@ export default function ItemCard({ item, view = 'grid', onClick }: ItemCardProps
       <CardContent className="p-3">
         <p className="text-sm font-semibold text-foreground truncate">{item.name}</p>
         <p className="text-xs text-muted-foreground mt-0.5">{item.categories?.emoji} {item.categories?.name}</p>
-        {item.purchase_price != null && (
-          <p className="text-sm font-bold text-primary mt-1">€{item.purchase_price.toFixed(2)}</p>
-        )}
+        <p className="text-sm font-bold text-primary mt-1">
+          {item.purchase_price != null ? `€${item.purchase_price.toFixed(2)}` : '—'}
+        </p>
       </CardContent>
     </Card>
   );
