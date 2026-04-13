@@ -5,8 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
-import { Plus, Pencil, Trash2, LogOut } from 'lucide-react';
+import { Plus, Pencil, Trash2, LogOut, ChevronDown, ChevronRight } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import CustomFieldsManager from '@/components/CustomFieldsManager';
 
 export default function SettingsPage() {
   const { data: categories = [], addCategory, updateCategory, deleteCategory } = useCategories();
@@ -16,6 +17,7 @@ export default function SettingsPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
   const [editEmoji, setEditEmoji] = useState('');
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const handleAdd = async () => {
     if (!newName.trim()) return;
@@ -52,47 +54,62 @@ export default function SettingsPage() {
           {/* List */}
           <div className="space-y-2 mt-4">
             {categories.map(cat => (
-              <div key={cat.id} className="flex items-center gap-3 rounded-lg border border-border p-3">
-                {editingId === cat.id ? (
-                  <>
-                    <Input value={editEmoji} onChange={e => setEditEmoji(e.target.value)} className="w-14 text-center" />
-                    <Input value={editName} onChange={e => setEditName(e.target.value)} className="flex-1" onKeyDown={e => e.key === 'Enter' && handleUpdate(cat.id)} />
-                    <Button size="sm" onClick={() => handleUpdate(cat.id)}>Opslaan</Button>
-                    <Button size="sm" variant="ghost" onClick={() => setEditingId(null)}>Annuleren</Button>
-                  </>
-                ) : (
-                  <>
-                    <span className="text-lg">{cat.emoji}</span>
-                    <span className="flex-1 text-sm font-medium text-foreground">{cat.name}</span>
-                    
-                    <div className="flex items-center gap-1">
-                      <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                        <Switch checked={!cat.is_hidden} onCheckedChange={checked => updateCategory.mutate({ id: cat.id, is_hidden: !checked })} />
-                      </label>
-                      <Button size="icon" variant="ghost" onClick={() => { setEditingId(cat.id); setEditName(cat.name); setEditEmoji(cat.emoji || ''); }}>
-                        <Pencil className="h-3.5 w-3.5" />
+              <div key={cat.id} className="rounded-lg border border-border">
+                <div className="flex items-center gap-3 p-3">
+                  {editingId === cat.id ? (
+                    <>
+                      <Input value={editEmoji} onChange={e => setEditEmoji(e.target.value)} className="w-14 text-center" />
+                      <Input value={editName} onChange={e => setEditName(e.target.value)} className="flex-1" onKeyDown={e => e.key === 'Enter' && handleUpdate(cat.id)} />
+                      <Button size="sm" onClick={() => handleUpdate(cat.id)}>Opslaan</Button>
+                      <Button size="sm" variant="ghost" onClick={() => setEditingId(null)}>Annuleren</Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-6 w-6 flex-shrink-0"
+                        onClick={() => setExpandedId(expandedId === cat.id ? null : cat.id)}
+                      >
+                        {expandedId === cat.id ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
                       </Button>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button size="icon" variant="ghost" className="text-destructive hover:text-destructive hover:bg-destructive/10">
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Categorie verwijderen?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Weet je het zeker? Items in deze categorie worden niet verwijderd, maar krijgen geen categorie meer toegewezen.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Annuleren</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => deleteCategory.mutate(cat.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Verwijderen</AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </>
+                      <span className="text-lg">{cat.emoji}</span>
+                      <span className="flex-1 text-sm font-medium text-foreground">{cat.name}</span>
+                      
+                      <div className="flex items-center gap-1">
+                        <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <Switch checked={!cat.is_hidden} onCheckedChange={checked => updateCategory.mutate({ id: cat.id, is_hidden: !checked })} />
+                        </label>
+                        <Button size="icon" variant="ghost" onClick={() => { setEditingId(cat.id); setEditName(cat.name); setEditEmoji(cat.emoji || ''); }}>
+                          <Pencil className="h-3.5 w-3.5" />
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button size="icon" variant="ghost" className="text-destructive hover:text-destructive hover:bg-destructive/10">
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Categorie verwijderen?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Weet je het zeker? Items in deze categorie worden niet verwijderd, maar krijgen geen categorie meer toegewezen.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Annuleren</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => deleteCategory.mutate(cat.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Verwijderen</AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    </>
+                  )}
+                </div>
+                {expandedId === cat.id && editingId !== cat.id && (
+                  <div className="px-3 pb-3">
+                    <CustomFieldsManager categoryId={cat.id} />
+                  </div>
                 )}
               </div>
             ))}
