@@ -132,7 +132,7 @@ export default function Dashboard() {
           <CardContent>
             <div className="space-y-3">
               {top5.map((item, i) => (
-                <div key={item.id} className="flex items-center gap-3">
+                <button key={item.id} onClick={() => navigate(`/collection?detail=${item.id}`)} className="flex items-center gap-3 w-full text-left hover:bg-secondary/50 rounded-lg p-1 -m-1 transition-colors cursor-pointer">
                   <span className="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-xs font-bold text-accent-foreground">
                     {i + 1}
                   </span>
@@ -145,7 +145,7 @@ export default function Dashboard() {
                     <p className="text-sm font-medium text-foreground truncate">{item.name}</p>
                   </div>
                   <span className="text-sm font-semibold text-foreground">€{item.purchase_price?.toFixed(2)}</span>
-                </div>
+                </button>
               ))}
             </div>
           </CardContent>

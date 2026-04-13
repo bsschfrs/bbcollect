@@ -23,11 +23,19 @@ export default function Collection() {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [conditionFilter, setConditionFilter] = useState('all');
 
-  // Apply category from URL query param on mount
+  // Apply category/detail from URL query params on mount
   useEffect(() => {
     const cat = searchParams.get('category');
     if (cat) setCategoryFilter(cat);
-  }, [searchParams]);
+    const detailId = searchParams.get('detail');
+    if (detailId && items.length > 0) {
+      const found = items.find(i => i.id === detailId);
+      if (found) {
+        setDetailItem(found);
+        setDetailOpen(true);
+      }
+    }
+  }, [searchParams, items]);
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortBy, setSortBy] = useState('created_at');
   const [view, setView] = useState<'grid' | 'list'>('grid');
