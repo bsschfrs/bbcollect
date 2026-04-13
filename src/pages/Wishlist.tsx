@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useCollectionItems } from '@/hooks/useCollectionItems';
 import { useCategories } from '@/hooks/useCategories';
+import { useCustomFields, useAllCustomFieldValues } from '@/hooks/useCustomFields';
 import ItemCard from '@/components/ItemCard';
 import ItemFormDialog from '@/components/ItemFormDialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -14,6 +15,10 @@ export default function Wishlist() {
   const { data: items = [], isLoading } = useCollectionItems('wishlist');
   const { data: categories = [] } = useCategories();
   const { updateItem } = useCollectionItems();
+  const { allFields } = useCustomFields();
+  const itemIds = useMemo(() => items.map(i => i.id), [items]);
+  const { values: allFieldValues } = useAllCustomFieldValues(itemIds);
+
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [editItem, setEditItem] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -86,7 +91,13 @@ export default function Wishlist() {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {filtered.map(item => (
             <div key={item.id} className="relative group">
-              <ItemCard item={item as any} view="grid" onClick={() => { setEditItem(item); setDialogOpen(true); }} />
+              <ItemCard
+                item={item as any}
+                view="grid"
+                onClick={() => { setEditItem(item); setDialogOpen(true); }}
+                customFields={allFields.filter(f => f.category_id === item.category_id)}
+                customFieldValues={allFieldValues.filter(v => v.item_id === item.id)}
+              />
               <Button
                 size="sm"
                 className="absolute bottom-14 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
