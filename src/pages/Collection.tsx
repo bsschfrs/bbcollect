@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useCollectionItems } from '@/hooks/useCollectionItems';
 import { useCategories } from '@/hooks/useCategories';
+import { useCustomFields, useAllCustomFieldValues } from '@/hooks/useCustomFields';
 import ItemCard from '@/components/ItemCard';
 import ItemFormDialog from '@/components/ItemFormDialog';
 import { Input } from '@/components/ui/input';
@@ -11,6 +12,10 @@ import { Search, LayoutGrid, List, Package } from 'lucide-react';
 export default function Collection() {
   const { data: items = [], isLoading } = useCollectionItems();
   const { data: categories = [] } = useCategories();
+  const { allFields } = useCustomFields();
+  const itemIds = useMemo(() => items.map(i => i.id), [items]);
+  const { values: allFieldValues } = useAllCustomFieldValues(itemIds);
+
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [conditionFilter, setConditionFilter] = useState('all');
@@ -19,16 +24,55 @@ export default function Collection() {
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [editItem, setEditItem] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [customFieldFilters, setCustomFieldFilters] = useState<Record<string, string>>({});
+
+  // Get dropdown custom fields for the selected category (or all if no category filter)
+  const dropdownFields = useMemo(() => {
+    if (categoryFilter !== 'all') {
+      return allFields.filter(f => f.category_id === categoryFilter && f.field_type === 'dropdown');
+    }
+    return [];
+  }, [allFields, categoryFilter]);
+
+  // Build a map of item_id -> field_id -> value for quick lookup
+  const fieldValueMap = useMemo(() => {
+    const map = new Map<string, Map<string, string>>();
+    allFieldValues.forEach(v => {
+      if (!map.has(v.item_id)) map.set(v.item_id, new Map());
+      if (v.value) map.get(v.item_id)!.set(v.field_id, v.value);
+    });
+    return map;
+  }, [allFieldValues]);
 
   const filtered = useMemo(() => {
     let result = items;
     if (search) {
       const q = search.toLowerCase();
-      result = result.filter(i => i.name.toLowerCase().includes(q) || i.notes?.toLowerCase().includes(q));
+      result = result.filter(i => {
+        if (i.name.toLowerCase().includes(q) || i.notes?.toLowerCase().includes(q)) return true;
+        // Search in custom field values
+        const vals = fieldValueMap.get(i.id);
+        if (vals) {
+          for (const v of vals.values()) {
+            if (v.toLowerCase().includes(q)) return true;
+          }
+        }
+        return false;
+      });
     }
     if (categoryFilter !== 'all') result = result.filter(i => i.category_id === categoryFilter);
     if (conditionFilter !== 'all') result = result.filter(i => i.condition === conditionFilter);
     if (statusFilter !== 'all') result = result.filter(i => i.status === statusFilter);
+
+    // Apply custom field filters
+    for (const [fieldId, filterValue] of Object.entries(customFieldFilters)) {
+      if (filterValue && filterValue !== 'all') {
+        result = result.filter(i => {
+          const vals = fieldValueMap.get(i.id);
+          return vals?.get(fieldId) === filterValue;
+        });
+      }
+    }
 
     result = [...result].sort((a, b) => {
       switch (sortBy) {
@@ -39,9 +83,15 @@ export default function Collection() {
       }
     });
     return result;
-  }, [items, search, categoryFilter, conditionFilter, statusFilter, sortBy]);
+  }, [items, search, categoryFilter, conditionFilter, statusFilter, sortBy, customFieldFilters, fieldValueMap]);
 
   const visibleCategories = categories.filter(c => !c.is_hidden);
+
+  // Reset custom field filters when category changes
+  const handleCategoryChange = (value: string) => {
+    setCategoryFilter(value);
+    setCustomFieldFilters({});
+  };
 
   return (
     <div className="space-y-6">
@@ -56,7 +106,7 @@ export default function Collection() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input placeholder="Zoeken..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9" />
         </div>
-        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+        <Select value={categoryFilter} onValueChange={handleCategoryChange}>
           <SelectTrigger className="w-[180px]"><SelectValue placeholder="Categorie" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Alle categorieën</SelectItem>
@@ -86,6 +136,22 @@ export default function Collection() {
             <SelectItem value="purchase_date">Aankoopdatum</SelectItem>
           </SelectContent>
         </Select>
+        {/* Custom field dropdown filters */}
+        {dropdownFields.map(field => (
+          <Select
+            key={field.id}
+            value={customFieldFilters[field.id] || 'all'}
+            onValueChange={v => setCustomFieldFilters(f => ({ ...f, [field.id]: v }))}
+          >
+            <SelectTrigger className="w-[150px]"><SelectValue placeholder={field.field_name} /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Alle {field.field_name.toLowerCase()}</SelectItem>
+              {field.dropdown_options?.map(opt => (
+                <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        ))}
         <div className="flex rounded-lg border border-border overflow-hidden">
           <Button variant={view === 'grid' ? 'default' : 'ghost'} size="icon" onClick={() => setView('grid')} className="rounded-none">
             <LayoutGrid className="h-4 w-4" />
@@ -112,13 +178,27 @@ export default function Collection() {
       ) : view === 'grid' ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {filtered.map(item => (
-            <ItemCard key={item.id} item={item as any} view="grid" onClick={() => { setEditItem(item); setDialogOpen(true); }} />
+            <ItemCard
+              key={item.id}
+              item={item as any}
+              view="grid"
+              onClick={() => { setEditItem(item); setDialogOpen(true); }}
+              customFields={allFields.filter(f => f.category_id === item.category_id)}
+              customFieldValues={allFieldValues.filter(v => v.item_id === item.id)}
+            />
           ))}
         </div>
       ) : (
         <div className="space-y-2">
           {filtered.map(item => (
-            <ItemCard key={item.id} item={item as any} view="list" onClick={() => { setEditItem(item); setDialogOpen(true); }} />
+            <ItemCard
+              key={item.id}
+              item={item as any}
+              view="list"
+              onClick={() => { setEditItem(item); setDialogOpen(true); }}
+              customFields={allFields.filter(f => f.category_id === item.category_id)}
+              customFieldValues={allFieldValues.filter(v => v.item_id === item.id)}
+            />
           ))}
         </div>
       )}

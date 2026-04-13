@@ -1,6 +1,7 @@
 import { Package, ExternalLink, TrendingUp } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import type { CustomField, CustomFieldValue } from '@/hooks/useCustomFields';
 
 interface ItemCardProps {
   item: {
@@ -18,6 +19,8 @@ interface ItemCardProps {
   };
   view?: 'grid' | 'list';
   onClick?: () => void;
+  customFields?: CustomField[];
+  customFieldValues?: CustomFieldValue[];
 }
 
 const conditionLabels: Record<string, string> = {
@@ -38,7 +41,25 @@ function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-export default function ItemCard({ item, view = 'grid', onClick }: ItemCardProps) {
+function CustomFieldDisplay({ fields, values }: { fields?: CustomField[]; values?: CustomFieldValue[] }) {
+  if (!fields?.length) return null;
+  const valueMap = new Map(values?.map(v => [v.field_id, v.value]) || []);
+  const fieldsWithValues = fields.filter(f => valueMap.has(f.id));
+  if (fieldsWithValues.length === 0) return null;
+
+  return (
+    <div className="mt-1 space-y-0.5">
+      {fieldsWithValues.map(field => (
+        <p key={field.id} className="text-[11px] text-muted-foreground truncate">
+          <span className="font-medium">{field.field_name}:</span>{' '}
+          {valueMap.get(field.id) || '—'}
+        </p>
+      ))}
+    </div>
+  );
+}
+
+export default function ItemCard({ item, view = 'grid', onClick, customFields, customFieldValues }: ItemCardProps) {
   if (view === 'list') {
     return (
       <Card className="card-shadow hover:card-shadow-hover transition-shadow cursor-pointer" onClick={onClick}>
@@ -60,6 +81,7 @@ export default function ItemCard({ item, view = 'grid', onClick }: ItemCardProps
               )}
             </div>
             <p className="text-xs text-muted-foreground">{item.categories?.emoji} {item.categories?.name}</p>
+            <CustomFieldDisplay fields={customFields} values={customFieldValues} />
           </div>
           <div className="text-right flex-shrink-0 space-y-0.5">
             <p className="text-sm font-semibold text-foreground">
@@ -120,6 +142,7 @@ export default function ItemCard({ item, view = 'grid', onClick }: ItemCardProps
         ) : (
           <p className="text-xs text-muted-foreground mt-0.5">Geschatte waarde: —</p>
         )}
+        <CustomFieldDisplay fields={customFields} values={customFieldValues} />
       </CardContent>
     </Card>
   );
