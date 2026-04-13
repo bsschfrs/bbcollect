@@ -112,6 +112,86 @@ export type Database = {
           },
         ]
       }
+      custom_field_values: {
+        Row: {
+          created_at: string
+          field_id: string
+          id: string
+          item_id: string
+          value: string | null
+        }
+        Insert: {
+          created_at?: string
+          field_id: string
+          id?: string
+          item_id: string
+          value?: string | null
+        }
+        Update: {
+          created_at?: string
+          field_id?: string
+          id?: string
+          item_id?: string
+          value?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custom_field_values_field_id_fkey"
+            columns: ["field_id"]
+            isOneToOne: false
+            referencedRelation: "custom_fields"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "custom_field_values_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "collection_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      custom_fields: {
+        Row: {
+          category_id: string
+          created_at: string
+          dropdown_options: string[] | null
+          field_name: string
+          field_type: Database["public"]["Enums"]["custom_field_type"]
+          id: string
+          sort_order: number
+          user_id: string
+        }
+        Insert: {
+          category_id: string
+          created_at?: string
+          dropdown_options?: string[] | null
+          field_name: string
+          field_type?: Database["public"]["Enums"]["custom_field_type"]
+          id?: string
+          sort_order?: number
+          user_id: string
+        }
+        Update: {
+          category_id?: string
+          created_at?: string
+          dropdown_options?: string[] | null
+          field_name?: string
+          field_type?: Database["public"]["Enums"]["custom_field_type"]
+          id?: string
+          sort_order?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custom_fields_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -120,6 +200,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      custom_field_type: "text" | "number" | "dropdown"
       item_condition: "mint" | "near_mint" | "good" | "fair" | "poor"
       item_status: "collection" | "wishlist"
       wishlist_priority: "low" | "medium" | "high"
@@ -250,6 +331,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      custom_field_type: ["text", "number", "dropdown"],
       item_condition: ["mint", "near_mint", "good", "fair", "poor"],
       item_status: ["collection", "wishlist"],
       wishlist_priority: ["low", "medium", "high"],
