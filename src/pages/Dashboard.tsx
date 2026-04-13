@@ -145,7 +145,7 @@ export default function Dashboard() {
                     <p className="text-sm font-medium text-foreground truncate">{item.name}</p>
                   </div>
                   <span className="text-sm font-semibold text-foreground">€{item.purchase_price?.toFixed(2)}</span>
-                </div>
+                </button>
               ))}
             </div>
           </CardContent>
