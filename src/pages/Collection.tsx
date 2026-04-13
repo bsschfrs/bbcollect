@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Search, LayoutGrid, List, Package } from 'lucide-react';
 
 export default function Collection() {
+  const [searchParams] = useSearchParams();
   const { data: items = [], isLoading } = useCollectionItems();
   const { data: categories = [] } = useCategories();
   const { allFields } = useCustomFields();
@@ -20,6 +21,12 @@ export default function Collection() {
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [conditionFilter, setConditionFilter] = useState('all');
+
+  // Apply category from URL query param on mount
+  useEffect(() => {
+    const cat = searchParams.get('category');
+    if (cat) setCategoryFilter(cat);
+  }, [searchParams]);
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortBy, setSortBy] = useState('created_at');
   const [view, setView] = useState<'grid' | 'list'>('grid');
