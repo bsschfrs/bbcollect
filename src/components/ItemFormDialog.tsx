@@ -24,6 +24,7 @@ interface ItemFormDialogProps {
 export default function ItemFormDialog({ open, onOpenChange, editItem, defaultStatus = 'collection' }: ItemFormDialogProps) {
   const { data: categories = [] } = useCategories();
   const { addItem, updateItem, deleteItem, uploadImage } = useCollectionItems();
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const visibleCategories = categories.filter(c => !c.is_hidden);
 
