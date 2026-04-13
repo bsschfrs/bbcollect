@@ -52,6 +52,7 @@ export type Database = {
           category_id: string | null
           condition: Database["public"]["Enums"]["item_condition"] | null
           created_at: string
+          estimated_value: number | null
           id: string
           image_url: string | null
           name: string
@@ -61,12 +62,15 @@ export type Database = {
           purchase_price: number | null
           status: Database["public"]["Enums"]["item_status"]
           updated_at: string
+          url: string | null
           user_id: string
+          value_updated_at: string | null
         }
         Insert: {
           category_id?: string | null
           condition?: Database["public"]["Enums"]["item_condition"] | null
           created_at?: string
+          estimated_value?: number | null
           id?: string
           image_url?: string | null
           name: string
@@ -76,12 +80,15 @@ export type Database = {
           purchase_price?: number | null
           status?: Database["public"]["Enums"]["item_status"]
           updated_at?: string
+          url?: string | null
           user_id: string
+          value_updated_at?: string | null
         }
         Update: {
           category_id?: string | null
           condition?: Database["public"]["Enums"]["item_condition"] | null
           created_at?: string
+          estimated_value?: number | null
           id?: string
           image_url?: string | null
           name?: string
@@ -91,7 +98,9 @@ export type Database = {
           purchase_price?: number | null
           status?: Database["public"]["Enums"]["item_status"]
           updated_at?: string
+          url?: string | null
           user_id?: string
+          value_updated_at?: string | null
         }
         Relationships: [
           {
