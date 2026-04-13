@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useCategories } from '@/hooks/useCategories';
 import { useCollectionItems } from '@/hooks/useCollectionItems';
+import { useCustomFields, useCustomFieldValues } from '@/hooks/useCustomFields';
 import { Camera, Trash2, Settings } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
@@ -37,9 +38,13 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
     url: '',
     estimated_value: '',
   });
+  const [customFieldValues, setCustomFieldValues] = useState<Record<string, string>>({});
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  const { fields } = useCustomFields(form.category_id || null);
+  const { values: existingValues } = useCustomFieldValues(editItem?.id || null);
 
   useEffect(() => {
     if (editItem) {
@@ -72,9 +77,28 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
         estimated_value: '',
       });
       setImagePreview(null);
+      setCustomFieldValues({});
     }
     setImageFile(null);
   }, [editItem, open, defaultStatus]);
+
+  // Load existing custom field values when editing
+  useEffect(() => {
+    if (existingValues.length > 0) {
+      const vals: Record<string, string> = {};
+      existingValues.forEach(v => {
+        if (v.value != null) vals[v.field_id] = v.value;
+      });
+      setCustomFieldValues(vals);
+    }
+  }, [existingValues]);
+
+  // Reset custom field values when category changes (only for new items)
+  useEffect(() => {
+    if (!editItem) {
+      setCustomFieldValues({});
+    }
+  }, [form.category_id]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -112,18 +136,50 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
         estimated_value: newEstimatedValue,
       };
 
-      // Auto-set value_updated_at when estimated_value changes
       if (newEstimatedValue != null && (!editItem || estimatedValueChanged)) {
         data.value_updated_at = new Date().toISOString().split('T')[0];
       } else if (newEstimatedValue == null) {
         data.value_updated_at = null;
       }
 
+      let itemId: string;
       if (editItem) {
         await updateItem.mutateAsync({ id: editItem.id, ...data });
+        itemId = editItem.id;
       } else {
-        await addItem.mutateAsync(data);
+        // For new items we need the ID back - use supabase directly
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: inserted, error } = await supabase
+          .from('collection_items')
+          .insert({ ...data, user_id: (await supabase.auth.getUser()).data.user?.id })
+          .select('id')
+          .single();
+        if (error) throw error;
+        itemId = inserted.id;
       }
+
+      // Save custom field values
+      if (fields.length > 0) {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const valuesToUpsert = fields
+          .filter(f => customFieldValues[f.id] !== undefined && customFieldValues[f.id] !== '')
+          .map(f => ({
+            item_id: itemId,
+            field_id: f.id,
+            value: customFieldValues[f.id] || null,
+          }));
+        if (valuesToUpsert.length > 0) {
+          const { error } = await supabase
+            .from('custom_field_values')
+            .upsert(valuesToUpsert, { onConflict: 'item_id,field_id' });
+          if (error) throw error;
+        }
+      }
+
+      // Invalidate queries
+      const { useQueryClient } = await import('@tanstack/react-query');
+      // We can't use hooks here, but the mutations will handle invalidation
+
       onOpenChange(false);
     } catch (err) {
       console.error(err);
@@ -269,6 +325,46 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
               </SelectContent>
             </Select>
           </div>
+
+          {/* Custom Fields */}
+          {fields.length > 0 && (
+            <div className="space-y-3 rounded-lg border border-border p-3 bg-muted/10">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Aangepaste velden</p>
+              {fields.map(field => (
+                <div key={field.id}>
+                  <Label className="text-sm">{field.field_name}</Label>
+                  {field.field_type === 'text' && (
+                    <Input
+                      value={customFieldValues[field.id] || ''}
+                      onChange={e => setCustomFieldValues(v => ({ ...v, [field.id]: e.target.value }))}
+                      placeholder={field.field_name}
+                    />
+                  )}
+                  {field.field_type === 'number' && (
+                    <Input
+                      type="number"
+                      value={customFieldValues[field.id] || ''}
+                      onChange={e => setCustomFieldValues(v => ({ ...v, [field.id]: e.target.value }))}
+                      placeholder="0"
+                    />
+                  )}
+                  {field.field_type === 'dropdown' && (
+                    <Select
+                      value={customFieldValues[field.id] || ''}
+                      onValueChange={val => setCustomFieldValues(v => ({ ...v, [field.id]: val }))}
+                    >
+                      <SelectTrigger><SelectValue placeholder={`Kies ${field.field_name.toLowerCase()}`} /></SelectTrigger>
+                      <SelectContent>
+                        {field.dropdown_options?.map(opt => (
+                          <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Notes */}
           <div>
