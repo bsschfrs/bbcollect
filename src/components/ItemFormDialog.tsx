@@ -150,8 +150,6 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
         await updateItem.mutateAsync({ id: editItem.id, ...data });
         itemId = editItem.id;
       } else {
-        // For new items we need the ID back - use supabase directly
-        const { supabase } = await import('@/integrations/supabase/client');
         const { data: inserted, error } = await supabase
           .from('collection_items')
           .insert({ ...data, user_id: (await supabase.auth.getUser()).data.user?.id })
@@ -163,7 +161,6 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
 
       // Save custom field values
       if (fields.length > 0) {
-        const { supabase } = await import('@/integrations/supabase/client');
         const valuesToUpsert = fields
           .filter(f => customFieldValues[f.id] !== undefined && customFieldValues[f.id] !== '')
           .map(f => ({
@@ -179,9 +176,8 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
         }
       }
 
-      // Invalidate queries
-      const { useQueryClient } = await import('@tanstack/react-query');
-      // We can't use hooks here, but the mutations will handle invalidation
+      queryClient.invalidateQueries({ queryKey: ['collection_items'] });
+      queryClient.invalidateQueries({ queryKey: ['custom_field_values'] });
 
       onOpenChange(false);
     } catch (err) {
