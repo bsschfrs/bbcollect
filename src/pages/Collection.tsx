@@ -5,6 +5,7 @@ import { useCategories } from '@/hooks/useCategories';
 import { useCustomFields, useAllCustomFieldValues } from '@/hooks/useCustomFields';
 import ItemCard from '@/components/ItemCard';
 import ItemFormDialog from '@/components/ItemFormDialog';
+import ItemDetailSheet from '@/components/ItemDetailSheet';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
@@ -30,6 +31,8 @@ export default function Collection() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortBy, setSortBy] = useState('created_at');
   const [view, setView] = useState<'grid' | 'list'>('grid');
+  const [detailItem, setDetailItem] = useState<any>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
   const [editItem, setEditItem] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [customFieldFilters, setCustomFieldFilters] = useState<Record<string, string>>({});
@@ -190,7 +193,7 @@ export default function Collection() {
               key={item.id}
               item={item as any}
               view="grid"
-              onClick={() => { setEditItem(item); setDialogOpen(true); }}
+              onClick={() => { setDetailItem(item); setDetailOpen(true); }}
               customFields={allFields.filter(f => f.category_id === item.category_id)}
               customFieldValues={allFieldValues.filter(v => v.item_id === item.id)}
             />
@@ -203,7 +206,7 @@ export default function Collection() {
               key={item.id}
               item={item as any}
               view="list"
-              onClick={() => { setEditItem(item); setDialogOpen(true); }}
+              onClick={() => { setDetailItem(item); setDetailOpen(true); }}
               customFields={allFields.filter(f => f.category_id === item.category_id)}
               customFieldValues={allFieldValues.filter(v => v.item_id === item.id)}
             />
@@ -211,6 +214,14 @@ export default function Collection() {
         </div>
       )}
 
+      <ItemDetailSheet
+        item={detailItem}
+        open={detailOpen}
+        onOpenChange={o => { setDetailOpen(o); if (!o) setDetailItem(null); }}
+        onEdit={() => { setDetailOpen(false); setEditItem(detailItem); setDialogOpen(true); }}
+        customFields={allFields.filter(f => f.category_id === detailItem?.category_id)}
+        customFieldValues={allFieldValues.filter(v => v.item_id === detailItem?.id)}
+      />
       <ItemFormDialog open={dialogOpen} onOpenChange={o => { setDialogOpen(o); if (!o) setEditItem(null); }} editItem={editItem} />
     </div>
   );
