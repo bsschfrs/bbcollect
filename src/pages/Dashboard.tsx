@@ -1,20 +1,20 @@
-import { useEffect } from 'react';
+import { useState } from 'react';
 import { useCollectionItems } from '@/hooks/useCollectionItems';
 import { useCategories } from '@/hooks/useCategories';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { DollarSign, Package, Heart, Trophy } from 'lucide-react';
+import OnboardingFlow from '@/components/OnboardingFlow';
 
 export default function Dashboard() {
   const { data: allItems = [] } = useCollectionItems();
-  const { data: categories = [], seedDefaults, isSuccess: categoriesLoaded } = useCategories();
+  const { data: categories = [], isSuccess: categoriesLoaded } = useCategories();
+  const [onboardingDismissed, setOnboardingDismissed] = useState(false);
 
-  // Seed default categories on first load (only after query has resolved)
-  useEffect(() => {
-    if (categoriesLoaded && categories.length === 0 && !seedDefaults.isPending && !seedDefaults.isSuccess) {
-      seedDefaults.mutate();
-    }
-  }, [categoriesLoaded, categories.length, seedDefaults.isPending, seedDefaults.isSuccess]);
+  // Show onboarding if user has no categories yet
+  if (categoriesLoaded && categories.length === 0 && !onboardingDismissed) {
+    return <OnboardingFlow onComplete={() => setOnboardingDismissed(true)} />;
+  }
 
   const collectionItems = allItems.filter(i => i.status === 'collection');
   const wishlistItems = allItems.filter(i => i.status === 'wishlist');
@@ -47,7 +47,6 @@ export default function Dashboard() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {/* Total Invested */}
         <Card className="card-shadow">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Totaal Geïnvesteerd</CardTitle>
@@ -59,7 +58,6 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* Collection Count */}
         <Card className="card-shadow">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">In Collectie</CardTitle>
@@ -71,7 +69,6 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* Wishlist Progress */}
         <Card className="card-shadow">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Wishlist Meter</CardTitle>
@@ -85,7 +82,6 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      {/* Category Breakdown */}
       {categoryCounts.length > 0 && (
         <Card className="card-shadow">
           <CardHeader>
@@ -104,7 +100,6 @@ export default function Dashboard() {
         </Card>
       )}
 
-      {/* Top 5 Most Valuable */}
       {top5.length > 0 && (
         <Card className="card-shadow">
           <CardHeader className="flex flex-row items-center gap-2">
@@ -125,7 +120,6 @@ export default function Dashboard() {
                   )}
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground truncate">{item.name}</p>
-                    <p className="text-xs text-muted-foreground">{(item as any).categories?.name}</p>
                   </div>
                   <span className="text-sm font-semibold text-foreground">€{item.purchase_price?.toFixed(2)}</span>
                 </div>
@@ -135,7 +129,6 @@ export default function Dashboard() {
         </Card>
       )}
 
-      {/* Empty State */}
       {allItems.length === 0 && (
         <Card className="card-shadow">
           <CardContent className="flex flex-col items-center justify-center py-12 text-center">

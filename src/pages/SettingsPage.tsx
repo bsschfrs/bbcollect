@@ -64,9 +64,7 @@ export default function SettingsPage() {
                   <>
                     <span className="text-lg">{cat.emoji}</span>
                     <span className="flex-1 text-sm font-medium text-foreground">{cat.name}</span>
-                    {cat.is_default && (
-                      <span className="text-[10px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full">Standaard</span>
-                    )}
+                    
                     <div className="flex items-center gap-1">
                       <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
                         <Switch checked={!cat.is_hidden} onCheckedChange={checked => updateCategory.mutate({ id: cat.id, is_hidden: !checked })} />

@@ -60,9 +60,13 @@ export default function Collection() {
           <SelectTrigger className="w-[180px]"><SelectValue placeholder="Categorie" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Alle categorieën</SelectItem>
-            {visibleCategories.map(c => (
-              <SelectItem key={c.id} value={c.id}>{c.emoji} {c.name}</SelectItem>
-            ))}
+            {visibleCategories.length === 0 ? (
+              <div className="px-3 py-2 text-sm text-muted-foreground">Nog geen categorieën aangemaakt</div>
+            ) : (
+              visibleCategories.map(c => (
+                <SelectItem key={c.id} value={c.id}>{c.emoji} {c.name}</SelectItem>
+              ))
+            )}
           </SelectContent>
         </Select>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
