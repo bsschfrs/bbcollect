@@ -1,4 +1,4 @@
-import { Package } from 'lucide-react';
+import { Package, ExternalLink, TrendingUp } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
@@ -8,6 +8,9 @@ interface ItemCardProps {
     name: string;
     image_url: string | null;
     purchase_price: number | null;
+    estimated_value?: number | null;
+    value_updated_at?: string | null;
+    url?: string | null;
     condition: string | null;
     status: string;
     priority: string | null;
@@ -31,6 +34,10 @@ const priorityColors: Record<string, string> = {
   low: 'bg-muted text-muted-foreground',
 };
 
+function formatDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
 export default function ItemCard({ item, view = 'grid', onClick }: ItemCardProps) {
   if (view === 'list') {
     return (
@@ -44,13 +51,26 @@ export default function ItemCard({ item, view = 'grid', onClick }: ItemCardProps
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-foreground truncate">{item.name}</p>
+            <div className="flex items-center gap-1.5">
+              <p className="text-sm font-semibold text-foreground truncate">{item.name}</p>
+              {item.url && (
+                <a href={item.url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="text-primary hover:text-primary/80 flex-shrink-0">
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+              )}
+            </div>
             <p className="text-xs text-muted-foreground">{item.categories?.emoji} {item.categories?.name}</p>
           </div>
-          <div className="text-right flex-shrink-0">
+          <div className="text-right flex-shrink-0 space-y-0.5">
             <p className="text-sm font-semibold text-foreground">
               {item.purchase_price != null ? `€${item.purchase_price.toFixed(2)}` : '—'}
             </p>
+            {item.estimated_value != null && (
+              <p className="text-xs text-primary flex items-center justify-end gap-0.5">
+                <TrendingUp className="h-3 w-3" />
+                €{item.estimated_value.toFixed(2)}
+              </p>
+            )}
             {item.condition && (
               <Badge variant="secondary" className="text-[10px] mt-1">{conditionLabels[item.condition] || item.condition}</Badge>
             )}
@@ -75,6 +95,11 @@ export default function ItemCard({ item, view = 'grid', onClick }: ItemCardProps
             {item.priority.charAt(0).toUpperCase() + item.priority.slice(1)}
           </Badge>
         )}
+        {item.url && (
+          <a href={item.url} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="absolute top-2 left-2 rounded-full bg-background/80 p-1.5 text-primary hover:bg-background">
+            <ExternalLink className="h-3.5 w-3.5" />
+          </a>
+        )}
       </div>
       <CardContent className="p-3">
         <p className="text-sm font-semibold text-foreground truncate">{item.name}</p>
@@ -82,6 +107,19 @@ export default function ItemCard({ item, view = 'grid', onClick }: ItemCardProps
         <p className="text-sm font-bold text-primary mt-1">
           {item.purchase_price != null ? `€${item.purchase_price.toFixed(2)}` : '—'}
         </p>
+        {item.estimated_value != null ? (
+          <div className="mt-0.5">
+            <p className="text-xs text-muted-foreground flex items-center gap-0.5">
+              <TrendingUp className="h-3 w-3 text-primary" />
+              Geschatte waarde: €{item.estimated_value.toFixed(2)}
+            </p>
+            {item.value_updated_at && (
+              <p className="text-[10px] text-muted-foreground/70">Bijgewerkt: {formatDate(item.value_updated_at)}</p>
+            )}
+          </div>
+        ) : (
+          <p className="text-xs text-muted-foreground mt-0.5">Geschatte waarde: —</p>
+        )}
       </CardContent>
     </Card>
   );
