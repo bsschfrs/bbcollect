@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCollectionItems } from '@/hooks/useCollectionItems';
 import { useCategories } from '@/hooks/useCategories';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,6 +8,7 @@ import { DollarSign, Package, Heart, Trophy, TrendingUp } from 'lucide-react';
 import OnboardingFlow from '@/components/OnboardingFlow';
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const { data: allItems = [] } = useCollectionItems();
   const { data: categories = [], isSuccess: categoriesLoaded } = useCategories();
   const [onboardingDismissed, setOnboardingDismissed] = useState(false);
@@ -107,10 +109,14 @@ export default function Dashboard() {
           <CardContent>
             <div className="flex flex-wrap gap-3">
               {categoryCounts.map(c => (
-                <div key={c.id} className="flex items-center gap-2 rounded-full bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground">
+                <button
+                  key={c.id}
+                  onClick={() => navigate(`/collection?category=${c.id}`)}
+                  className="flex items-center gap-2 rounded-full bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground hover:bg-secondary/70 transition-colors cursor-pointer"
+                >
                   <span>{c.emoji}</span>
                   <span>{c.count} {c.name}</span>
-                </div>
+                </button>
               ))}
             </div>
           </CardContent>
