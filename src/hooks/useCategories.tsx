@@ -2,16 +2,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 
-const DEFAULT_CATEGORIES = [
-  { name: 'Pokémon Cards', emoji: '🃏' },
-  { name: 'Pokémon Elite Trainer Boxes', emoji: '📦' },
-  { name: 'Pokémon Games', emoji: '🎮' },
-  { name: 'Vinyl Records', emoji: '🎵' },
-  { name: 'Game Consoles', emoji: '🕹️' },
-  { name: 'Handheld Game Consoles', emoji: '📱' },
-  { name: 'Voetbalshirts', emoji: '⚽' },
-];
-
 export function useCategories() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -23,34 +13,11 @@ export function useCategories() {
       const { data, error } = await supabase
         .from('categories')
         .select('*')
-        .order('is_default', { ascending: false })
         .order('name');
       if (error) throw error;
       return data;
     },
     enabled: !!user,
-  });
-
-  const seedDefaults = useMutation({
-    mutationFn: async () => {
-      if (!user) throw new Error('Not authenticated');
-      // Check if user already has categories before seeding
-      const { data: existing } = await supabase
-        .from('categories')
-        .select('id')
-        .eq('user_id', user.id)
-        .limit(1);
-      if (existing && existing.length > 0) return;
-      const inserts = DEFAULT_CATEGORIES.map(c => ({
-        user_id: user.id,
-        name: c.name,
-        emoji: c.emoji,
-        is_default: true,
-      }));
-      const { error } = await supabase.from('categories').insert(inserts);
-      if (error) throw error;
-    },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['categories'] }),
   });
 
   const addCategory = useMutation({
@@ -87,5 +54,5 @@ export function useCategories() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['categories'] }),
   });
 
-  return { ...query, seedDefaults, addCategory, updateCategory, deleteCategory };
+  return { ...query, addCategory, updateCategory, deleteCategory };
 }

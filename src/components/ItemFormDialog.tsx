@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useCategories } from '@/hooks/useCategories';
 import { useCollectionItems } from '@/hooks/useCollectionItems';
-import { Camera, Trash2 } from 'lucide-react';
+import { Camera, Trash2, Settings } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 interface ItemFormDialogProps {
@@ -20,6 +21,7 @@ interface ItemFormDialogProps {
 export default function ItemFormDialog({ open, onOpenChange, editItem, defaultStatus = 'collection' }: ItemFormDialogProps) {
   const { data: categories = [] } = useCategories();
   const { addItem, updateItem, deleteItem, uploadImage } = useCollectionItems();
+  const navigate = useNavigate();
   const visibleCategories = categories.filter(c => !c.is_hidden);
 
   const [form, setForm] = useState({
@@ -88,7 +90,7 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
 
       const data = {
         name: form.name,
-        category_id: form.category_id,
+        category_id: form.category_id || null,
         status: form.status as 'collection' | 'wishlist',
         purchase_price: form.purchase_price ? parseFloat(form.purchase_price) : null,
         purchase_date: form.purchase_date || null,
@@ -117,6 +119,8 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
       onOpenChange(false);
     }
   };
+
+  const hasNoCategories = visibleCategories.length === 0;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -150,14 +154,30 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
           {/* Category */}
           <div>
             <Label>Categorie</Label>
-            <Select value={form.category_id} onValueChange={v => setForm(f => ({ ...f, category_id: v }))}>
-              <SelectTrigger><SelectValue placeholder="Kies categorie" /></SelectTrigger>
-              <SelectContent>
-                {visibleCategories.map(c => (
-                  <SelectItem key={c.id} value={c.id}>{c.emoji} {c.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {hasNoCategories ? (
+              <div className="flex items-center gap-2 rounded-lg border border-dashed border-border p-3 bg-muted/30 mt-1">
+                <p className="text-sm text-muted-foreground flex-1">
+                  Nog geen categorieën — maak er een aan in Instellingen.
+                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => { onOpenChange(false); navigate('/settings'); }}
+                >
+                  <Settings className="h-3.5 w-3.5 mr-1" /> Instellingen
+                </Button>
+              </div>
+            ) : (
+              <Select value={form.category_id} onValueChange={v => setForm(f => ({ ...f, category_id: v }))}>
+                <SelectTrigger><SelectValue placeholder="Kies categorie" /></SelectTrigger>
+                <SelectContent>
+                  {visibleCategories.map(c => (
+                    <SelectItem key={c.id} value={c.id}>{c.emoji} {c.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           {/* Status */}
