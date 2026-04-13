@@ -34,6 +34,8 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
     notes: '',
     priority: '',
     image_url: '',
+    url: '',
+    estimated_value: '',
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -51,6 +53,8 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
         notes: editItem.notes || '',
         priority: editItem.priority || '',
         image_url: editItem.image_url || '',
+        url: editItem.url || '',
+        estimated_value: editItem.estimated_value?.toString() || '',
       });
       setImagePreview(editItem.image_url || null);
     } else {
@@ -64,6 +68,8 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
         notes: '',
         priority: '',
         image_url: '',
+        url: '',
+        estimated_value: '',
       });
       setImagePreview(null);
     }
@@ -88,7 +94,11 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
         imageUrl = await uploadImage(imageFile);
       }
 
-      const data = {
+      const newEstimatedValue = form.estimated_value ? parseFloat(form.estimated_value) : null;
+      const oldEstimatedValue = editItem?.estimated_value ?? null;
+      const estimatedValueChanged = newEstimatedValue !== oldEstimatedValue;
+
+      const data: any = {
         name: form.name,
         category_id: form.category_id || null,
         status: form.status as 'collection' | 'wishlist',
@@ -98,7 +108,16 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
         notes: form.notes || null,
         priority: form.status === 'wishlist' ? (form.priority || null) as any : null,
         image_url: imageUrl || null,
+        url: form.url || null,
+        estimated_value: newEstimatedValue,
       };
+
+      // Auto-set value_updated_at when estimated_value changes
+      if (newEstimatedValue != null && (!editItem || estimatedValueChanged)) {
+        data.value_updated_at = new Date().toISOString().split('T')[0];
+      } else if (newEstimatedValue == null) {
+        data.value_updated_at = null;
+      }
 
       if (editItem) {
         await updateItem.mutateAsync({ id: editItem.id, ...data });
@@ -217,6 +236,23 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
               <Label htmlFor="date">Aankoopdatum</Label>
               <Input id="date" type="date" value={form.purchase_date} onChange={e => setForm(f => ({ ...f, purchase_date: e.target.value }))} />
             </div>
+          </div>
+
+          {/* Estimated Value */}
+          <div>
+            <Label htmlFor="estimated_value">Geschatte waarde (€)</Label>
+            <Input id="estimated_value" type="number" step="0.01" min="0" placeholder="0.00" value={form.estimated_value} onChange={e => setForm(f => ({ ...f, estimated_value: e.target.value }))} />
+            {editItem?.value_updated_at && form.estimated_value === editItem.estimated_value?.toString() && (
+              <p className="text-[11px] text-muted-foreground mt-1">
+                Laatst bijgewerkt: {new Date(editItem.value_updated_at).toLocaleDateString('nl-NL')}
+              </p>
+            )}
+          </div>
+
+          {/* URL */}
+          <div>
+            <Label htmlFor="url">Link (URL)</Label>
+            <Input id="url" type="url" placeholder="https://..." value={form.url} onChange={e => setForm(f => ({ ...f, url: e.target.value }))} />
           </div>
 
           {/* Condition */}

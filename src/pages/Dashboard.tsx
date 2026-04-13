@@ -3,7 +3,7 @@ import { useCollectionItems } from '@/hooks/useCollectionItems';
 import { useCategories } from '@/hooks/useCategories';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { DollarSign, Package, Heart, Trophy } from 'lucide-react';
+import { DollarSign, Package, Heart, Trophy, TrendingUp } from 'lucide-react';
 import OnboardingFlow from '@/components/OnboardingFlow';
 
 export default function Dashboard() {
@@ -11,7 +11,6 @@ export default function Dashboard() {
   const { data: categories = [], isSuccess: categoriesLoaded } = useCategories();
   const [onboardingDismissed, setOnboardingDismissed] = useState(false);
 
-  // Show onboarding if user has no categories yet
   if (categoriesLoaded && categories.length === 0 && !onboardingDismissed) {
     return <OnboardingFlow onComplete={() => setOnboardingDismissed(true)} />;
   }
@@ -19,6 +18,7 @@ export default function Dashboard() {
   const collectionItems = allItems.filter(i => i.status === 'collection');
   const wishlistItems = allItems.filter(i => i.status === 'wishlist');
   const totalInvested = collectionItems.reduce((sum, i) => sum + (i.purchase_price ?? 0), 0);
+  const estimatedTotal = collectionItems.reduce((sum, i) => sum + ((i as any).estimated_value ?? 0), 0);
 
   const wishlisScored = wishlistItems.length > 0
     ? Math.round((collectionItems.length / (collectionItems.length + wishlistItems.length)) * 100)
@@ -46,7 +46,7 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="card-shadow">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Totaal Geïnvesteerd</CardTitle>
@@ -54,7 +54,24 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-foreground">€{totalInvested.toFixed(2)}</div>
-            <p className="text-xs text-muted-foreground mt-1">In al je collecties</p>
+            <p className="text-xs text-muted-foreground mt-1">Aankoopprijzen</p>
+          </CardContent>
+        </Card>
+
+        <Card className="card-shadow">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Geschatte Waarde</CardTitle>
+            <TrendingUp className="h-4 w-4 text-primary" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-foreground">€{estimatedTotal.toFixed(2)}</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {estimatedTotal >= totalInvested && totalInvested > 0
+                ? `+€${(estimatedTotal - totalInvested).toFixed(2)} winst`
+                : totalInvested > 0
+                  ? `-€${(totalInvested - estimatedTotal).toFixed(2)} verlies`
+                  : 'Huidige waarde'}
+            </p>
           </CardContent>
         </Card>
 
