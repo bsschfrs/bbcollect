@@ -8,6 +8,7 @@ import { DollarSign, Package, Heart, Trophy, TrendingUp } from 'lucide-react';
 import OnboardingFlow from '@/components/OnboardingFlow';
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const { data: allItems = [] } = useCollectionItems();
   const { data: categories = [], isSuccess: categoriesLoaded } = useCategories();
   const [onboardingDismissed, setOnboardingDismissed] = useState(false);
