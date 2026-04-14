@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Package, ExternalLink, TrendingUp, Pencil, Calendar, Tag, FileText } from 'lucide-react';
+import { useCurrency } from '@/hooks/useProfile';
 import type { CustomField, CustomFieldValue } from '@/hooks/useCustomFields';
 
 interface ItemDetailSheetProps {
@@ -95,7 +96,7 @@ export default function ItemDetailSheet({ item, open, onOpenChange, onEdit, cust
             <div className="rounded-lg bg-muted/50 p-3">
               <p className="text-xs text-muted-foreground">Aankoopprijs</p>
               <p className="text-lg font-bold text-foreground mt-0.5">
-                {item.purchase_price != null ? `€${Number(item.purchase_price).toFixed(2)}` : '—'}
+                {item.purchase_price != null ? `${currency}${Number(item.purchase_price).toFixed(2)}` : '—'}
               </p>
             </div>
             <div className="rounded-lg bg-muted/50 p-3">
@@ -103,7 +104,7 @@ export default function ItemDetailSheet({ item, open, onOpenChange, onEdit, cust
                 <TrendingUp className="h-3 w-3" /> Geschatte waarde
               </p>
               <p className="text-lg font-bold text-primary mt-0.5">
-                {item.estimated_value != null ? `€${Number(item.estimated_value).toFixed(2)}` : '—'}
+                {item.estimated_value != null ? `${currency}${Number(item.estimated_value).toFixed(2)}` : '—'}
               </p>
               {item.value_updated_at && (
                 <p className="text-[10px] text-muted-foreground mt-0.5">
