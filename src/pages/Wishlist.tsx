@@ -7,7 +7,7 @@ import ItemFormDialog from '@/components/ItemFormDialog';
 import ItemDetailSheet from '@/components/ItemDetailSheet';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Heart, Check, LayoutGrid, List } from 'lucide-react';
+import { Heart, Check, LayoutGrid, List, Search } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
