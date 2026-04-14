@@ -1,6 +1,7 @@
 import { Package, ExternalLink, TrendingUp } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { useCurrency } from '@/hooks/useProfile';
 import type { CustomField, CustomFieldValue } from '@/hooks/useCustomFields';
 
 interface ItemCardProps {
@@ -60,6 +61,7 @@ function CustomFieldDisplay({ fields, values }: { fields?: CustomField[]; values
 }
 
 export default function ItemCard({ item, view = 'grid', onClick, customFields, customFieldValues }: ItemCardProps) {
+  const currency = useCurrency();
   if (view === 'list') {
     return (
       <Card className="card-shadow hover:card-shadow-hover transition-shadow cursor-pointer" onClick={onClick}>
@@ -85,12 +87,12 @@ export default function ItemCard({ item, view = 'grid', onClick, customFields, c
           </div>
           <div className="text-right flex-shrink-0 space-y-0.5">
             <p className="text-sm font-semibold text-foreground">
-              {item.purchase_price != null ? `€${item.purchase_price.toFixed(2)}` : '—'}
+              {item.purchase_price != null ? `${currency}${item.purchase_price.toFixed(2)}` : '—'}
             </p>
             {item.estimated_value != null && (
               <p className="text-xs text-primary flex items-center justify-end gap-0.5">
                 <TrendingUp className="h-3 w-3" />
-                €{item.estimated_value.toFixed(2)}
+                {currency}{item.estimated_value.toFixed(2)}
               </p>
             )}
             {item.condition && (
@@ -127,13 +129,13 @@ export default function ItemCard({ item, view = 'grid', onClick, customFields, c
         <p className="text-sm font-semibold text-foreground truncate">{item.name}</p>
         <p className="text-xs text-muted-foreground mt-0.5">{item.categories?.emoji} {item.categories?.name}</p>
         <p className="text-sm font-bold text-primary mt-1">
-          {item.purchase_price != null ? `€${item.purchase_price.toFixed(2)}` : '—'}
+          {item.purchase_price != null ? `${currency}${item.purchase_price.toFixed(2)}` : '—'}
         </p>
         {item.estimated_value != null ? (
           <div className="mt-0.5">
             <p className="text-xs text-muted-foreground flex items-center gap-0.5">
               <TrendingUp className="h-3 w-3 text-primary" />
-              Geschatte waarde: €{item.estimated_value.toFixed(2)}
+              Geschatte waarde: {currency}{item.estimated_value.toFixed(2)}
             </p>
             {item.value_updated_at && (
               <p className="text-[10px] text-muted-foreground/70">Bijgewerkt: {formatDate(item.value_updated_at)}</p>
