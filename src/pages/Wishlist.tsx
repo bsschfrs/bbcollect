@@ -20,6 +20,7 @@ export default function Wishlist() {
   const itemIds = useMemo(() => items.map(i => i.id), [items]);
   const { values: allFieldValues } = useAllCustomFieldValues(itemIds);
 
+  const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [detailItem, setDetailItem] = useState<any>(null);
   const [detailOpen, setDetailOpen] = useState(false);
