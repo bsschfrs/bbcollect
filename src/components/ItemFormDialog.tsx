@@ -15,6 +15,7 @@ import { useCollectionItems } from '@/hooks/useCollectionItems';
 import { useCustomFields, useCustomFieldValues } from '@/hooks/useCustomFields';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Camera, Trash2, Settings, X } from 'lucide-react';
+import ImageCropper from '@/components/ImageCropper';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 interface ItemFormDialogProps {
