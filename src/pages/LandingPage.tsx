@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Package, LayoutGrid, Heart, TrendingUp, Tags, ArrowRight } from 'lucide-react';
 import dashboardPreview from '@/assets/dashboard-preview.jpg';
+import logo from '@/assets/logo.jpeg';
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -12,9 +13,7 @@ export default function LandingPage() {
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
         <div className="max-w-5xl mx-auto flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary">
-              <Package className="h-5 w-5 text-primary-foreground" />
-            </div>
+            <img src={logo} alt="BB Collect logo" className="h-9 w-9 rounded-lg object-cover" />
             <span className="text-lg font-bold text-foreground">BB Collect</span>
           </div>
           <div className="flex items-center gap-2">
