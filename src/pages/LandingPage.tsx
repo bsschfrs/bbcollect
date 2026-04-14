@@ -53,6 +53,21 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Preview */}
+      <section className="px-4 pb-16 md:pb-24">
+        <div className="max-w-2xl mx-auto">
+          <div className="rounded-2xl border border-border/60 shadow-xl overflow-hidden bg-card">
+            <img
+              src={dashboardPreview}
+              alt="BB Collect dashboard voorbeeld"
+              width={800}
+              height={600}
+              className="w-full h-auto"
+            />
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="border-t border-border px-4 py-6">
         <div className="max-w-5xl mx-auto flex items-center justify-between text-sm text-muted-foreground">
