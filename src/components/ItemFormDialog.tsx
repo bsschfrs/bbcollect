@@ -15,6 +15,7 @@ import { useCollectionItems } from '@/hooks/useCollectionItems';
 import { useCustomFields, useCustomFieldValues } from '@/hooks/useCustomFields';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Camera, Trash2, Settings, X } from 'lucide-react';
+import ImageCropper from '@/components/ImageCropper';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 interface ItemFormDialogProps {
@@ -50,6 +51,7 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [cropperSrc, setCropperSrc] = useState<string | null>(null);
 
   const { fields } = useCustomFields(form.category_id || null);
   const { values: existingValues } = useCustomFieldValues(editItem?.id || null);
@@ -109,9 +111,16 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setImageFile(file);
-      setImagePreview(URL.createObjectURL(file));
+      const url = URL.createObjectURL(file);
+      setCropperSrc(url);
     }
+    e.target.value = '';
+  };
+
+  const handleCropComplete = (croppedFile: File) => {
+    setImageFile(croppedFile);
+    setImagePreview(URL.createObjectURL(croppedFile));
+    setCropperSrc(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -395,40 +404,55 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
     </form>
   );
 
+  const cropperElement = cropperSrc ? (
+    <ImageCropper
+      imageSrc={cropperSrc}
+      open={!!cropperSrc}
+      onClose={() => setCropperSrc(null)}
+      onCropComplete={handleCropComplete}
+    />
+  ) : null;
+
   if (isMobile) {
     return (
-      <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent className="h-[100dvh] max-h-[100dvh] rounded-none">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-            <DrawerHeader className="p-0">
-              <DrawerTitle className="text-lg font-semibold">{title}</DrawerTitle>
-            </DrawerHeader>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="h-10 w-10 rounded-full"
-              onClick={() => onOpenChange(false)}
-            >
-              <X className="h-5 w-5" />
-            </Button>
-          </div>
-          <div className="flex-1 overflow-y-auto px-4 py-4 pb-8">
-            {formContent}
-          </div>
-        </DrawerContent>
-      </Drawer>
+      <>
+        {cropperElement}
+        <Drawer open={open} onOpenChange={onOpenChange}>
+          <DrawerContent className="h-[100dvh] max-h-[100dvh] rounded-none">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+              <DrawerHeader className="p-0">
+                <DrawerTitle className="text-lg font-semibold">{title}</DrawerTitle>
+              </DrawerHeader>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-10 w-10 rounded-full"
+                onClick={() => onOpenChange(false)}
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            <div className="flex-1 overflow-y-auto px-4 py-4 pb-8">
+              {formContent}
+            </div>
+          </DrawerContent>
+        </Drawer>
+      </>
     );
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-        </DialogHeader>
-        {formContent}
-      </DialogContent>
-    </Dialog>
+    <>
+      {cropperElement}
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{title}</DialogTitle>
+          </DialogHeader>
+          {formContent}
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
