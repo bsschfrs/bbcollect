@@ -29,6 +29,13 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <AppLayout>{children}</AppLayout>;
 }
 
+function AuthRoute() {
+  const [searchParams] = useSearchParams();
+  const mode = searchParams.get('mode');
+  if (mode === 'login' || mode === 'register') return <Auth />;
+  return <LandingPage />;
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
