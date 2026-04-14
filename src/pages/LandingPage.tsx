@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Package, ArrowRight, Loader2 } from 'lucide-react';
-import mockup from '@/assets/bb-collect-mockup.png';
+import mockup from '@/assets/bb-collect-combined-mockup.png';
 import logo from '@/assets/logo.jpeg';
 
 export default function LandingPage() {
@@ -75,11 +75,11 @@ export default function LandingPage() {
       </section>
 
       {/* Mockup */}
-      <section className="px-6 pb-16 md:pb-24">
-        <div className="max-w-[200px] md:max-w-[240px] mx-auto">
+      <section className="px-4 pb-16 md:pb-24">
+        <div className="max-w-3xl mx-auto">
           <img
             src={mockup}
-            alt="BB Collect app voorbeeld"
+            alt="BB Collect desktop en mobiel voorbeeld"
             className="w-full h-auto object-contain drop-shadow-2xl"
           />
         </div>
