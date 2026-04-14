@@ -1,14 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Package, LayoutGrid, Heart, TrendingUp, Tags, ArrowRight } from 'lucide-react';
-import dashboardPreview from '@/assets/dashboard-preview.jpg';
+import { Package, ArrowRight } from 'lucide-react';
 import logo from '@/assets/logo.jpeg';
 
 export default function LandingPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Navigation */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
         <div className="max-w-5xl mx-auto flex items-center justify-between px-4 py-3">
@@ -28,7 +27,7 @@ export default function LandingPage() {
       </header>
 
       {/* Hero */}
-      <section className="px-4 pt-16 pb-12 md:pt-24 md:pb-20">
+      <section className="flex-1 flex items-center justify-center px-4 py-16 md:py-24">
         <div className="max-w-3xl mx-auto text-center space-y-6">
           <div className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-1.5 text-sm font-medium text-accent-foreground">
             <Package className="h-4 w-4" />
@@ -53,82 +52,12 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Preview */}
-      <section className="px-4 pb-16 md:pb-24">
-        <div className="max-w-2xl mx-auto">
-          <div className="rounded-2xl border border-border/60 shadow-xl overflow-hidden bg-card">
-            <img
-              src={dashboardPreview}
-              alt="BB Collect dashboard voorbeeld"
-              width={800}
-              height={600}
-              className="w-full h-auto"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Features */}
-      <section className="px-4 py-16 md:py-24 bg-muted/40">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground">Alles wat je nodig hebt</h2>
-            <p className="text-muted-foreground mt-2">Krachtige tools om je collectie te beheren</p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <FeatureCard
-              icon={<LayoutGrid className="h-6 w-6" />}
-              title="Collectie bijhouden"
-              description="Voeg items toe met foto's, aankoopprijzen, conditie en persoonlijke notities. Alles op één plek."
-            />
-            <FeatureCard
-              icon={<Heart className="h-6 w-6" />}
-              title="Wishlist met prioriteiten"
-              description="Houd bij wat je nog zoekt en geef prioriteiten aan. Scoor je een item? Verplaats het met één klik naar je collectie."
-            />
-            <FeatureCard
-              icon={<TrendingUp className="h-6 w-6" />}
-              title="Waarde-overzicht"
-              description="Zie in één oogopslag hoeveel je hebt geïnvesteerd en wat je collectie nu waard is."
-            />
-            <FeatureCard
-              icon={<Tags className="h-6 w-6" />}
-              title="Categorieën & velden"
-              description="Organiseer met eigen categorieën en voeg aangepaste velden toe zoals editie, kleur of maat."
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Bottom CTA */}
-      <section className="px-4 py-16 md:py-24">
-        <div className="max-w-lg mx-auto text-center space-y-6">
-          <h2 className="text-2xl md:text-3xl font-bold text-foreground">Klaar om te beginnen?</h2>
-          <p className="text-muted-foreground">Maak gratis een account aan en begin met het bijhouden van je collectie.</p>
-          <Button size="lg" onClick={() => navigate('/auth?mode=register')} className="gap-2">
-            Account aanmaken <ArrowRight className="h-4 w-4" />
-          </Button>
-        </div>
-      </section>
-
       {/* Footer */}
       <footer className="border-t border-border px-4 py-6">
         <div className="max-w-5xl mx-auto flex items-center justify-between text-sm text-muted-foreground">
           <span>© {new Date().getFullYear()} BB Collect</span>
         </div>
       </footer>
-    </div>
-  );
-}
-
-function FeatureCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
-  return (
-    <div className="rounded-xl border border-border bg-card p-6 space-y-3">
-      <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-accent text-primary">
-        {icon}
-      </div>
-      <h3 className="text-lg font-semibold text-foreground">{title}</h3>
-      <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
     </div>
   );
 }
