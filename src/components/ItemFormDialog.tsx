@@ -415,27 +415,30 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
 
   if (isMobile) {
     return (
-      <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent className="h-[100dvh] max-h-[100dvh] rounded-none">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-            <DrawerHeader className="p-0">
-              <DrawerTitle className="text-lg font-semibold">{title}</DrawerTitle>
-            </DrawerHeader>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="h-10 w-10 rounded-full"
-              onClick={() => onOpenChange(false)}
-            >
-              <X className="h-5 w-5" />
-            </Button>
-          </div>
-          <div className="flex-1 overflow-y-auto px-4 py-4 pb-8">
-            {formContent}
-          </div>
-        </DrawerContent>
-      </Drawer>
+      <>
+        {cropperElement}
+        <Drawer open={open} onOpenChange={onOpenChange}>
+          <DrawerContent className="h-[100dvh] max-h-[100dvh] rounded-none">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+              <DrawerHeader className="p-0">
+                <DrawerTitle className="text-lg font-semibold">{title}</DrawerTitle>
+              </DrawerHeader>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-10 w-10 rounded-full"
+                onClick={() => onOpenChange(false)}
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            <div className="flex-1 overflow-y-auto px-4 py-4 pb-8">
+              {formContent}
+            </div>
+          </DrawerContent>
+        </Drawer>
+      </>
     );
   }
 
