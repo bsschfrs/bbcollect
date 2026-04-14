@@ -29,10 +29,6 @@ export default function LandingPage() {
       {/* Hero */}
       <section className="flex-1 flex items-start justify-center px-4 pt-8 pb-16 md:pt-12 md:pb-24">
         <div className="max-w-3xl mx-auto text-center space-y-6">
-          <div className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-1.5 text-sm font-medium text-accent-foreground">
-            <Package className="h-4 w-4" />
-            Gratis aan de slag
-          </div>
           <h1 className="text-4xl md:text-5xl font-bold text-foreground leading-tight tracking-tight">
             Beheer al je collecties
             <br />
