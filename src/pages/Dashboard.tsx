@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { DollarSign, Package, Heart, Trophy, TrendingUp, Pencil, X, Plus, Check } from 'lucide-react';
 import OnboardingFlow from '@/components/OnboardingFlow';
 import { useDashboardLayout } from '@/hooks/useDashboardLayout';
+import { useCurrency } from '@/hooks/useProfile';
 import { cn } from '@/lib/utils';
 
 export default function Dashboard() {
