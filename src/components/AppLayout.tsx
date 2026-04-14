@@ -23,7 +23,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   const { profile } = useProfile();
   const [addOpen, setAddOpen] = useState(false);
 
-  const initials = (profile?.display_name || user?.email || '?')
+  const initials = (profile?.username || user?.email || '?')
     .split(/[\s@]/)
     .slice(0, 2)
     .map(s => s[0]?.toUpperCase())
@@ -81,7 +81,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             <AvatarImage src={profile?.avatar_url ?? undefined} alt="Profiel" />
             <AvatarFallback className="text-xs bg-primary/10 text-primary">{initials}</AvatarFallback>
           </Avatar>
-          <span className="truncate">{profile?.display_name || 'Profiel'}</span>
+          <span className="truncate">{profile?.username || 'Profiel'}</span>
         </button>
       </aside>
 
