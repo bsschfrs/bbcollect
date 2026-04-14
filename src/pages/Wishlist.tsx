@@ -35,6 +35,10 @@ export default function Wishlist() {
 
   const filtered = useMemo(() => {
     let result = items;
+    if (search) {
+      const q = search.toLowerCase();
+      result = result.filter(i => i.name.toLowerCase().includes(q) || i.notes?.toLowerCase().includes(q));
+    }
     if (categoryFilter !== 'all') result = result.filter(i => i.category_id === categoryFilter);
     return [...result].sort((a, b) => {
       const pa = priorityOrder[a.priority as keyof typeof priorityOrder] ?? 3;
