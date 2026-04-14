@@ -5,7 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Package, ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+import authLogo from '@/assets/logo.jpeg';
 
 export default function Auth() {
   const { user, loading, signIn, signUp } = useAuth();
