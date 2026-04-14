@@ -46,6 +46,7 @@ function DetailRow({ label, value, icon: Icon }: { label: string; value: React.R
 }
 
 export default function ItemDetailSheet({ item, open, onOpenChange, onEdit, customFields, customFieldValues }: ItemDetailSheetProps) {
+  const currency = useCurrency();
   if (!item) return null;
 
   const valueMap = new Map(customFieldValues?.map(v => [v.field_id, v.value]) || []);
