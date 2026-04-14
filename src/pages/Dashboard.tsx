@@ -92,7 +92,7 @@ export default function Dashboard() {
           <DollarSign className="h-4 w-4 text-primary" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-foreground">€{totalInvested.toFixed(2)}</div>
+          <div className="text-2xl font-bold text-foreground">{currency}{totalInvested.toFixed(2)}</div>
           <p className="text-xs text-muted-foreground mt-1">Aankoopprijzen</p>
         </CardContent>
       </Card>
@@ -104,12 +104,12 @@ export default function Dashboard() {
           <TrendingUp className="h-4 w-4 text-primary" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-foreground">€{estimatedTotal.toFixed(2)}</div>
+          <div className="text-2xl font-bold text-foreground">{currency}{estimatedTotal.toFixed(2)}</div>
           <p className="text-xs text-muted-foreground mt-1">
             {estimatedTotal >= totalInvested && totalInvested > 0
-              ? `+€${(estimatedTotal - totalInvested).toFixed(2)} winst`
+              ? `+${currency}${(estimatedTotal - totalInvested).toFixed(2)} winst`
               : totalInvested > 0
-                ? `-€${(totalInvested - estimatedTotal).toFixed(2)} verlies`
+                ? `-${currency}${(totalInvested - estimatedTotal).toFixed(2)} verlies`
                 : 'Huidige waarde'}
           </p>
         </CardContent>
@@ -182,7 +182,7 @@ export default function Dashboard() {
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-foreground truncate">{item.name}</p>
                 </div>
-                <span className="text-sm font-semibold text-foreground">€{item.purchase_price?.toFixed(2)}</span>
+                <span className="text-sm font-semibold text-foreground">{currency}{item.purchase_price?.toFixed(2)}</span>
               </button>
             ))}
           </div>
