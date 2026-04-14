@@ -30,13 +30,15 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         </div>
 
         {/* Add button */}
-        <button
-          onClick={() => setAddOpen(true)}
-          className="flex items-center justify-center gap-2 rounded-lg bg-primary text-primary-foreground px-4 py-2.5 text-sm font-medium mb-4 hover:bg-primary/90 transition-colors shadow-sm"
-        >
-          <Plus className="h-5 w-5" />
-          Toevoegen
-        </button>
+        {showAddButton && (
+          <button
+            onClick={() => setAddOpen(true)}
+            className="flex items-center justify-center gap-2 rounded-lg bg-primary text-primary-foreground px-4 py-2.5 text-sm font-medium mb-4 hover:bg-primary/90 transition-colors shadow-sm"
+          >
+            <Plus className="h-5 w-5" />
+            Toevoegen
+          </button>
+        )}
 
         <nav className="flex-1 space-y-1">
           {navItems.map(({ to, icon: Icon, label }) => (
