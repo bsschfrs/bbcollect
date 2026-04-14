@@ -45,7 +45,7 @@ export default function Wishlist() {
       const pb = priorityOrder[b.priority as keyof typeof priorityOrder] ?? 3;
       return pa - pb;
     });
-  }, [items, categoryFilter]);
+  }, [items, search, categoryFilter]);
 
   const visibleCategories = categories.filter(c => !c.is_hidden);
 
