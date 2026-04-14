@@ -1,28 +1,27 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Package, ArrowRight } from 'lucide-react';
+import { Package, ArrowRight, Loader2 } from 'lucide-react';
 import mockup from '@/assets/bb-collect-mockup.png';
 import logo from '@/assets/logo.jpeg';
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState<'register' | 'login' | null>(null);
+
+  const handleNavigate = (mode: 'register' | 'login') => {
+    setLoading(mode);
+    setTimeout(() => navigate(`/auth?mode=${mode}`), 400);
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Navigation */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
-        <div className="max-w-5xl mx-auto flex items-center justify-between px-4 py-3">
+        <div className="max-w-5xl mx-auto flex items-center px-4 py-3">
           <div className="flex items-center gap-2">
             <img src={logo} alt="BB Collect logo" className="h-9 w-9 rounded-lg object-cover" />
             <span className="text-lg font-bold text-foreground">BB Collect</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={() => navigate('/auth?mode=login')}>
-              Inloggen
-            </Button>
-            <Button size="sm" onClick={() => navigate('/auth?mode=register')}>
-              Registreren
-            </Button>
           </div>
         </div>
       </header>
@@ -43,11 +42,30 @@ export default function LandingPage() {
             Houd bij wat je hebt, wat je zoekt en wat het waard is. Of het nu gaat om sneakers, vinyl, Pokémon-kaarten of postzegels — BB Collect houdt alles overzichtelijk.
           </p>
           <div className="flex items-center justify-center gap-3 pt-2">
-            <Button size="lg" onClick={() => navigate('/auth?mode=register')} className="gap-2">
-              Gratis beginnen <ArrowRight className="h-4 w-4" />
+            <Button
+              size="lg"
+              onClick={() => handleNavigate('register')}
+              disabled={loading !== null}
+              className="gap-2 active:scale-95 transition-transform duration-150"
+            >
+              {loading === 'register' ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <>Gratis beginnen <ArrowRight className="h-4 w-4" /></>
+              )}
             </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate('/auth?mode=login')}>
-              Inloggen
+            <Button
+              size="lg"
+              variant="outline"
+              onClick={() => handleNavigate('login')}
+              disabled={loading !== null}
+              className="active:scale-95 transition-transform duration-150"
+            >
+              {loading === 'login' ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                'Inloggen'
+              )}
             </Button>
           </div>
         </div>
