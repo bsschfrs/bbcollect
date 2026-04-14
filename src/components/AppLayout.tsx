@@ -19,7 +19,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen bg-background">
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex flex-col w-64 border-r border-border bg-card p-4">
+      <aside className="hidden md:flex flex-col w-64 fixed top-0 left-0 h-screen border-r border-border bg-card p-4 z-40">
         <div className="flex items-center gap-2 px-3 py-4 mb-4">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
             <Package className="h-5 w-5 text-primary-foreground" />
@@ -51,6 +51,9 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           Uitloggen
         </button>
       </aside>
+
+      {/* Sidebar spacer for desktop */}
+      <div className="hidden md:block w-64 flex-shrink-0" />
 
       {/* Main Content */}
       <main className="flex-1 pb-20 md:pb-0 overflow-auto">
