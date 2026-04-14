@@ -67,10 +67,7 @@ export default function Auth() {
         </button>
         <Card className="w-full card-shadow">
           <CardHeader className="text-center space-y-2">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
-              <Package className="h-6 w-6 text-primary-foreground" />
-            </div>
-            <CardTitle className="text-2xl font-bold">BB Collect</CardTitle>
+            <img src={authLogo} alt="BB Collect logo" className="mx-auto h-14 w-14 rounded-xl object-cover" />
             <CardDescription>
               {isLogin ? 'Welkom terug! Log in om verder te gaan.' : 'Maak een account aan om te beginnen.'}
             </CardDescription>
