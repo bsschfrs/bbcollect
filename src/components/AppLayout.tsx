@@ -14,6 +14,7 @@ const navItems = [
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
+  const showAddButton = pathname !== '/settings';
   const { signOut } = useAuth();
   const [addOpen, setAddOpen] = useState(false);
 
@@ -29,13 +30,15 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         </div>
 
         {/* Add button */}
-        <button
-          onClick={() => setAddOpen(true)}
-          className="flex items-center justify-center gap-2 rounded-lg bg-primary text-primary-foreground px-4 py-2.5 text-sm font-medium mb-4 hover:bg-primary/90 transition-colors shadow-sm"
-        >
-          <Plus className="h-5 w-5" />
-          Toevoegen
-        </button>
+        {showAddButton && (
+          <button
+            onClick={() => setAddOpen(true)}
+            className="flex items-center justify-center gap-2 rounded-lg bg-primary text-primary-foreground px-4 py-2.5 text-sm font-medium mb-4 hover:bg-primary/90 transition-colors shadow-sm"
+          >
+            <Plus className="h-5 w-5" />
+            Toevoegen
+          </button>
+        )}
 
         <nav className="flex-1 space-y-1">
           {navItems.map(({ to, icon: Icon, label }) => (
@@ -74,13 +77,15 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       </main>
 
       {/* Mobile FAB */}
-      <button
-        onClick={() => setAddOpen(true)}
-        className="fixed md:hidden bottom-20 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors"
-        aria-label="Toevoegen"
-      >
-        <Plus className="h-6 w-6" />
-      </button>
+      {showAddButton && (
+        <button
+          onClick={() => setAddOpen(true)}
+          className="fixed md:hidden bottom-20 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors"
+          aria-label="Toevoegen"
+        >
+          <Plus className="h-6 w-6" />
+        </button>
+      )}
 
       {/* Mobile Bottom Nav */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 flex md:hidden border-t border-border bg-card px-4 pb-[env(safe-area-inset-bottom)]">
