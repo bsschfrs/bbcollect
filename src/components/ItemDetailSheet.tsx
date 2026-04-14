@@ -53,7 +53,7 @@ export default function ItemDetailSheet({ item, open, onOpenChange, onEdit, cust
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-lg overflow-y-auto p-0">
         {/* Image */}
-        <div className="aspect-[4/3] relative bg-muted">
+        <div className="aspect-square sm:aspect-[4/3] relative bg-muted">
           {item.image_url ? (
             <img src={item.image_url} alt={item.name} className="h-full w-full object-cover" />
           ) : (
