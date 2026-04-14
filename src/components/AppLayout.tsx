@@ -14,6 +14,7 @@ const navItems = [
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
+  const showAddButton = pathname !== '/settings';
   const { signOut } = useAuth();
   const [addOpen, setAddOpen] = useState(false);
 
