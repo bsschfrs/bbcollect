@@ -20,6 +20,7 @@ export default function Wishlist() {
   const { allFields } = useCustomFields();
   const itemIds = useMemo(() => items.map(i => i.id), [items]);
   const { values: allFieldValues } = useAllCustomFieldValues(itemIds);
+  const currency = useCurrency();
 
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -173,7 +174,7 @@ export default function Wishlist() {
           <p className="text-sm text-muted-foreground">Verplaats "{moveItem?.name}" naar je collectie.</p>
           <div className="space-y-3 mt-2">
             <div>
-              <Label>Aankoopprijs (€)</Label>
+              <Label>Aankoopprijs ({currency})</Label>
               <Input type="number" step="0.01" min="0" placeholder="0.00" value={movePrice} onChange={e => setMovePrice(e.target.value)} />
             </div>
             <div>
