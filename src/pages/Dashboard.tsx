@@ -15,6 +15,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { data: allItems = [] } = useCollectionItems();
   const { data: categories = [], isSuccess: categoriesLoaded } = useCategories();
+  const currency = useCurrency();
   const [onboardingDismissed, setOnboardingDismissed] = useState(false);
 
   const {
