@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Camera, User, LogOut, Trash2, Calendar, Package, FolderOpen, Shield, ArrowLeft } from 'lucide-react';
+import { Camera, User, LogOut, Trash2, Calendar, Package, FolderOpen, Shield, ArrowLeft, Check, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
@@ -31,26 +31,67 @@ const CURRENCIES = [
 export default function ProfilePage() {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
-  const { profile, updateProfile, uploadAvatar, currency } = useProfile();
+  const { profile, updateProfile, uploadAvatar, checkUsernameAvailable, currency } = useProfile();
   const { data: allItems = [] } = useCollectionItems();
   const { data: categories = [] } = useCategories();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [displayName, setDisplayName] = useState(profile?.display_name ?? '');
+  const [username, setUsername] = useState(profile?.username ?? '');
+  const [usernameStatus, setUsernameStatus] = useState<'idle' | 'checking' | 'available' | 'taken' | 'current'>('idle');
   const [saving, setSaving] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [deleting, setDeleting] = useState(false);
+  const checkTimer = useRef<ReturnType<typeof setTimeout>>();
+
+  // Sync username when profile loads
+  useEffect(() => {
+    if (profile?.username && !username) {
+      setUsername(profile.username);
+    }
+  }, [profile?.username]);
 
   const collectionCount = allItems.filter(i => i.status === 'collection').length;
   const categoryCount = categories.filter(c => !c.is_hidden).length;
   const memberSince = user?.created_at ? format(new Date(user.created_at), 'd MMMM yyyy', { locale: nl }) : '—';
 
-  const initials = (profile?.display_name || user?.email || '?')
+  const initials = (profile?.username || user?.email || '?')
     .split(/[\s@]/)
     .slice(0, 2)
     .map(s => s[0]?.toUpperCase())
     .join('');
+
+  // Real-time username availability check
+  const checkUsername = useCallback((value: string) => {
+    if (checkTimer.current) clearTimeout(checkTimer.current);
+
+    const trimmed = value.trim();
+    if (!trimmed) {
+      setUsernameStatus('idle');
+      return;
+    }
+    if (trimmed.toLowerCase() === profile?.username?.toLowerCase()) {
+      setUsernameStatus('current');
+      return;
+    }
+    if (trimmed.length < 3) {
+      setUsernameStatus('idle');
+      return;
+    }
+
+    setUsernameStatus('checking');
+    checkTimer.current = setTimeout(async () => {
+      const available = await checkUsernameAvailable(trimmed);
+      setUsernameStatus(available ? 'available' : 'taken');
+    }, 400);
+  }, [profile?.username, checkUsernameAvailable]);
+
+  const handleUsernameChange = (value: string) => {
+    // Only allow alphanumeric, underscores, dashes
+    const sanitized = value.replace(/[^a-zA-Z0-9_\-]/g, '');
+    setUsername(sanitized);
+    checkUsername(sanitized);
+  };
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -63,13 +104,28 @@ export default function ProfilePage() {
     }
   };
 
-  const handleSaveName = async () => {
+  const handleSaveUsername = async () => {
+    const trimmed = username.trim();
+    if (trimmed.length < 3) {
+      toast.error('Gebruikersnaam moet minimaal 3 tekens zijn');
+      return;
+    }
+    if (usernameStatus === 'taken') {
+      toast.error('Deze gebruikersnaam is al in gebruik');
+      return;
+    }
     setSaving(true);
     try {
-      await updateProfile({ display_name: displayName || null });
-      toast.success('Naam opgeslagen');
-    } catch {
-      toast.error('Fout bij opslaan');
+      await updateProfile({ username: trimmed });
+      setUsernameStatus('current');
+      toast.success('Gebruikersnaam opgeslagen');
+    } catch (err: any) {
+      if (err?.code === '23505') {
+        toast.error('Deze gebruikersnaam is al in gebruik');
+        setUsernameStatus('taken');
+      } else {
+        toast.error('Fout bij opslaan');
+      }
     }
     setSaving(false);
   };
@@ -103,7 +159,6 @@ export default function ProfilePage() {
   const handleDeleteAccount = async () => {
     setDeleting(true);
     try {
-      // Delete profile data (items + categories cascade via RLS, profile deleted)
       await supabase.from('collection_items').delete().eq('user_id', user!.id);
       await supabase.from('categories').delete().eq('user_id', user!.id);
       await supabase.from('profiles').delete().eq('user_id', user!.id);
@@ -115,6 +170,8 @@ export default function ProfilePage() {
     }
   };
 
+  const canSaveUsername = username.trim().length >= 3 && (usernameStatus === 'available' || (usernameStatus === 'current' && username !== profile?.username));
+
   return (
     <div className="space-y-6 max-w-lg mx-auto">
       {/* Back button */}
@@ -123,7 +180,7 @@ export default function ProfilePage() {
         Terug
       </button>
 
-      {/* Profile photo & name */}
+      {/* Profile photo & username */}
       <Card className="card-shadow">
         <CardContent className="pt-6">
           <div className="flex flex-col items-center gap-4">
@@ -150,18 +207,40 @@ export default function ProfilePage() {
             </div>
 
             <div className="w-full space-y-2">
-              <Label htmlFor="displayName">Weergavenaam</Label>
+              <Label htmlFor="username">Gebruikersnaam</Label>
               <div className="flex gap-2">
-                <Input
-                  id="displayName"
-                  value={displayName}
-                  onChange={e => setDisplayName(e.target.value)}
-                  placeholder="Jouw naam"
-                />
-                <Button onClick={handleSaveName} disabled={saving} size="sm" className="shrink-0">
+                <div className="relative flex-1">
+                  <Input
+                    id="username"
+                    value={username}
+                    onChange={e => handleUsernameChange(e.target.value)}
+                    placeholder="jouw_username"
+                    maxLength={30}
+                    className="pr-8"
+                  />
+                  {usernameStatus === 'available' && (
+                    <Check className="absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-green-500" />
+                  )}
+                  {usernameStatus === 'taken' && (
+                    <X className="absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-destructive" />
+                  )}
+                </div>
+                <Button onClick={handleSaveUsername} disabled={saving || !canSaveUsername} size="sm" className="shrink-0">
                   Opslaan
                 </Button>
               </div>
+              {usernameStatus === 'checking' && (
+                <p className="text-xs text-muted-foreground">Controleren...</p>
+              )}
+              {usernameStatus === 'available' && (
+                <p className="text-xs text-green-600">Beschikbaar ✓</p>
+              )}
+              {usernameStatus === 'taken' && (
+                <p className="text-xs text-destructive">Deze gebruikersnaam is al in gebruik</p>
+              )}
+              {usernameStatus === 'idle' && username.length > 0 && username.length < 3 && (
+                <p className="text-xs text-muted-foreground">Minimaal 3 tekens</p>
+              )}
             </div>
 
             <p className="text-xs text-muted-foreground">{user?.email}</p>
