@@ -19,7 +19,7 @@ export default function LandingPage() {
       {/* Navigation */}
       <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
         <div className="max-w-5xl mx-auto flex items-center px-4 py-3">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 mx-auto">
             <img src={logo} alt="BB Collect logo" className="h-9 w-9 rounded-lg object-cover" />
             <span className="text-lg font-bold text-foreground">BB Collect</span>
           </div>
@@ -39,7 +39,10 @@ export default function LandingPage() {
             <span className="text-primary">op één plek</span>
           </h1>
           <p className="text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed">
-            Houd bij wat je hebt, wat je zoekt en wat het waard is. Of het nu gaat om sneakers, vinyl, Pokémon-kaarten of postzegels — BB Collect houdt alles overzichtelijk.
+            Houd bij wat je hebt, wat je zoekt en wat het waard is. Of het nu gaat om sneakers, vinyl, Pokémon-kaarten of postzegels.
+          </p>
+          <p className="text-lg font-semibold text-foreground">
+            BB Collect houdt alles overzichtelijk.
           </p>
           <div className="flex items-center justify-center gap-3 pt-2">
             <Button
