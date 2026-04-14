@@ -7,7 +7,7 @@ import ItemFormDialog from '@/components/ItemFormDialog';
 import ItemDetailSheet from '@/components/ItemDetailSheet';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Heart, Check } from 'lucide-react';
+import { Heart, Check, LayoutGrid, List } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -28,6 +28,7 @@ export default function Wishlist() {
   const [moveItem, setMoveItem] = useState<any>(null);
   const [movePrice, setMovePrice] = useState('');
   const [moveDate, setMoveDate] = useState('');
+  const [view, setView] = useState<'grid' | 'list'>('grid');
 
   const priorityOrder = { high: 0, medium: 1, low: 2 };
 
@@ -59,9 +60,25 @@ export default function Wishlist() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Wishlist</h1>
-        <p className="text-muted-foreground">{items.length} items op je wishlist</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Wishlist</h1>
+          <p className="text-muted-foreground">{items.length} items op je wishlist</p>
+        </div>
+        <div className="flex items-center gap-1 text-muted-foreground">
+          <button
+            onClick={() => setView('grid')}
+            className={`p-1.5 rounded-md transition-colors ${view === 'grid' ? 'text-foreground bg-muted' : 'hover:text-foreground'}`}
+          >
+            <LayoutGrid className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => setView('list')}
+            className={`p-1.5 rounded-md transition-colors ${view === 'list' ? 'text-foreground bg-muted' : 'hover:text-foreground'}`}
+          >
+            <List className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
       <div className="flex gap-3">
@@ -90,7 +107,7 @@ export default function Wishlist() {
           <h3 className="text-lg font-semibold text-foreground">Je wishlist is leeg</h3>
           <p className="text-sm text-muted-foreground mt-1">Voeg items toe die je nog wilt scoren!</p>
         </div>
-      ) : (
+      ) : view === 'grid' ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {filtered.map(item => (
             <div key={item.id} className="relative group">
@@ -108,6 +125,20 @@ export default function Wishlist() {
               >
                 <Check className="h-3 w-3 mr-1" /> Gescoord!
               </Button>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {filtered.map(item => (
+            <div key={item.id} className="relative group">
+              <ItemCard
+                item={item as any}
+                view="list"
+                onClick={() => { setDetailItem(item); setDetailOpen(true); }}
+                customFields={allFields.filter(f => f.category_id === item.category_id)}
+                customFieldValues={allFieldValues.filter(v => v.item_id === item.id)}
+              />
             </div>
           ))}
         </div>

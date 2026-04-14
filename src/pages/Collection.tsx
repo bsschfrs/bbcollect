@@ -114,9 +114,25 @@ export default function Collection() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Mijn Collectie</h1>
-        <p className="text-muted-foreground">{items.length} items in totaal</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Mijn Collectie</h1>
+          <p className="text-muted-foreground">{items.length} items in totaal</p>
+        </div>
+        <div className="flex items-center gap-1 text-muted-foreground">
+          <button
+            onClick={() => setView('grid')}
+            className={`p-1.5 rounded-md transition-colors ${view === 'grid' ? 'text-foreground bg-muted' : 'hover:text-foreground'}`}
+          >
+            <LayoutGrid className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => setView('list')}
+            className={`p-1.5 rounded-md transition-colors ${view === 'list' ? 'text-foreground bg-muted' : 'hover:text-foreground'}`}
+          >
+            <List className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -163,14 +179,6 @@ export default function Collection() {
             </SelectContent>
           </Select>
         ))}
-        <div className="flex rounded-lg border border-border overflow-hidden">
-          <Button variant={view === 'grid' ? 'default' : 'ghost'} size="icon" onClick={() => setView('grid')} className="rounded-none">
-            <LayoutGrid className="h-4 w-4" />
-          </Button>
-          <Button variant={view === 'list' ? 'default' : 'ghost'} size="icon" onClick={() => setView('list')} className="rounded-none">
-            <List className="h-4 w-4" />
-          </Button>
-        </div>
       </div>
 
       {/* Items */}
