@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Package, ArrowRight } from 'lucide-react';
+import dashboardPreview from '@/assets/dashboard-preview.jpg';
 import logo from '@/assets/logo.jpeg';
 
 export default function LandingPage() {
