@@ -160,7 +160,7 @@ export default function Collection() {
             <SelectItem value="created_at">Nieuwste</SelectItem>
             <SelectItem value="name">Naam</SelectItem>
             <SelectItem value="price">Prijs</SelectItem>
-            <SelectItem value="purchase_date">Aankoopdatum</SelectItem>
+            <SelectItem value="purchase_date">Datum verkregen</SelectItem>
           </SelectContent>
         </Select>
         {/* Custom field dropdown filters */}

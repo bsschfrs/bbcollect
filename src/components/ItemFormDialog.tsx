@@ -284,7 +284,7 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
           <Input id="price" type="number" step="0.01" min="0" placeholder="0.00" value={form.purchase_price} onChange={e => setForm(f => ({ ...f, purchase_price: e.target.value }))} />
         </div>
         <div>
-          <Label htmlFor="date">Aankoopdatum</Label>
+          <Label htmlFor="date">Datum verkregen</Label>
           <Input id="date" type="date" value={form.purchase_date} onChange={e => setForm(f => ({ ...f, purchase_date: e.target.value }))} />
         </div>
       </div>

@@ -121,7 +121,7 @@ export default function ItemDetailSheet({ item, open, onOpenChange, onEdit, cust
               } icon={Tag} />
             )}
             {item.purchase_date && (
-              <DetailRow label="Aankoopdatum" value={formatDate(item.purchase_date)} icon={Calendar} />
+              <DetailRow label="Datum verkregen" value={formatDate(item.purchase_date)} icon={Calendar} />
             )}
             {item.notes && (
               <DetailRow label="Notities" value={
