@@ -73,7 +73,7 @@ export default function LandingPage() {
 
       {/* Mockup */}
       <section className="px-6 pb-16 md:pb-24">
-        <div className="max-w-xs md:max-w-sm mx-auto">
+        <div className="max-w-[200px] md:max-w-[240px] mx-auto">
           <img
             src={mockup}
             alt="BB Collect app voorbeeld"
