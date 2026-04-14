@@ -51,6 +51,7 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [cropperSrc, setCropperSrc] = useState<string | null>(null);
 
   const { fields } = useCustomFields(form.category_id || null);
   const { values: existingValues } = useCustomFieldValues(editItem?.id || null);
