@@ -176,7 +176,7 @@ export default function Wishlist() {
               <Input type="number" step="0.01" min="0" placeholder="0.00" value={movePrice} onChange={e => setMovePrice(e.target.value)} />
             </div>
             <div>
-              <Label>Aankoopdatum</Label>
+              <Label>Datum verkregen</Label>
               <Input type="date" value={moveDate} onChange={e => setMoveDate(e.target.value)} />
             </div>
           </div>
