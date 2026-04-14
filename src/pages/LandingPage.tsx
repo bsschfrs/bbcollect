@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Package, ArrowRight } from 'lucide-react';
+import dashboardPreview from '@/assets/dashboard-preview.jpg';
 import logo from '@/assets/logo.jpeg';
 
 export default function LandingPage() {
@@ -48,6 +49,21 @@ export default function LandingPage() {
             <Button size="lg" variant="outline" onClick={() => navigate('/auth?mode=login')}>
               Inloggen
             </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Preview */}
+      <section className="px-4 pb-16 md:pb-24">
+        <div className="max-w-2xl mx-auto">
+          <div className="rounded-2xl border border-border/60 shadow-xl overflow-hidden bg-card">
+            <img
+              src={dashboardPreview}
+              alt="BB Collect dashboard voorbeeld"
+              width={800}
+              height={600}
+              className="w-full h-auto"
+            />
           </div>
         </div>
       </section>
