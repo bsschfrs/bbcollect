@@ -7,7 +7,7 @@ import ItemFormDialog from '@/components/ItemFormDialog';
 import ItemDetailSheet from '@/components/ItemDetailSheet';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Heart, Check, LayoutGrid, List } from 'lucide-react';
+import { Heart, Check, LayoutGrid, List, Search } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,6 +20,7 @@ export default function Wishlist() {
   const itemIds = useMemo(() => items.map(i => i.id), [items]);
   const { values: allFieldValues } = useAllCustomFieldValues(itemIds);
 
+  const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [detailItem, setDetailItem] = useState<any>(null);
   const [detailOpen, setDetailOpen] = useState(false);
@@ -34,13 +35,17 @@ export default function Wishlist() {
 
   const filtered = useMemo(() => {
     let result = items;
+    if (search) {
+      const q = search.toLowerCase();
+      result = result.filter(i => i.name.toLowerCase().includes(q) || i.notes?.toLowerCase().includes(q));
+    }
     if (categoryFilter !== 'all') result = result.filter(i => i.category_id === categoryFilter);
     return [...result].sort((a, b) => {
       const pa = priorityOrder[a.priority as keyof typeof priorityOrder] ?? 3;
       const pb = priorityOrder[b.priority as keyof typeof priorityOrder] ?? 3;
       return pa - pb;
     });
-  }, [items, categoryFilter]);
+  }, [items, search, categoryFilter]);
 
   const visibleCategories = categories.filter(c => !c.is_hidden);
 
@@ -81,7 +86,11 @@ export default function Wishlist() {
         </div>
       </div>
 
-      <div className="flex gap-3">
+      <div className="flex flex-wrap gap-3">
+        <div className="relative flex-1 min-w-[200px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input placeholder="Zoeken..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9" />
+        </div>
         <Select value={categoryFilter} onValueChange={setCategoryFilter}>
           <SelectTrigger className="w-[200px]"><SelectValue placeholder="Categorie" /></SelectTrigger>
           <SelectContent>
