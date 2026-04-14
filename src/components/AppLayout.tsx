@@ -60,7 +60,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       </main>
 
       {/* Mobile Bottom Nav */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 flex md:hidden border-t border-border bg-card">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 flex md:hidden border-t border-border bg-card pb-[env(safe-area-inset-bottom)]">
         {navItems.map(({ to, icon: Icon, label }) => (
           <Link
             key={to}
