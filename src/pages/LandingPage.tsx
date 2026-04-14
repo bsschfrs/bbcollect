@@ -84,13 +84,6 @@ export default function LandingPage() {
           />
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="border-t border-border px-4 py-6">
-        <div className="max-w-5xl mx-auto flex items-center justify-between text-sm text-muted-foreground">
-          <span>© {new Date().getFullYear()} BB Collect</span>
-        </div>
-      </footer>
     </div>
   );
 }
