@@ -30,6 +30,7 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const currency = useCurrency();
   const visibleCategories = categories.filter(c => !c.is_hidden);
 
   const [form, setForm] = useState({
@@ -281,7 +282,7 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
       {/* Price & Date Row */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="price">Aankoopprijs (€)</Label>
+          <Label htmlFor="price">Aankoopprijs ({currency})</Label>
           <Input id="price" type="number" step="0.01" min="0" placeholder="0.00" value={form.purchase_price} onChange={e => setForm(f => ({ ...f, purchase_price: e.target.value }))} />
         </div>
         <div>
@@ -292,7 +293,7 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
 
       {/* Estimated Value */}
       <div>
-        <Label htmlFor="estimated_value">Geschatte waarde (€)</Label>
+        <Label htmlFor="estimated_value">Geschatte waarde ({currency})</Label>
         <Input id="estimated_value" type="number" step="0.01" min="0" placeholder="0.00" value={form.estimated_value} onChange={e => setForm(f => ({ ...f, estimated_value: e.target.value }))} />
         {editItem?.value_updated_at && form.estimated_value === editItem.estimated_value?.toString() && (
           <p className="text-[11px] text-muted-foreground mt-1">

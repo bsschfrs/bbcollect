@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useCurrency } from '@/hooks/useProfile';
 import { useCollectionItems } from '@/hooks/useCollectionItems';
 import { useCategories } from '@/hooks/useCategories';
 import { useCustomFields, useAllCustomFieldValues } from '@/hooks/useCustomFields';
