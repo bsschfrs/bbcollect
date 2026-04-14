@@ -111,9 +111,16 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setImageFile(file);
-      setImagePreview(URL.createObjectURL(file));
+      const url = URL.createObjectURL(file);
+      setCropperSrc(url);
     }
+    e.target.value = '';
+  };
+
+  const handleCropComplete = (croppedFile: File) => {
+    setImageFile(croppedFile);
+    setImagePreview(URL.createObjectURL(croppedFile));
+    setCropperSrc(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
