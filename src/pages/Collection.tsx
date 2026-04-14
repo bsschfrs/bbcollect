@@ -13,7 +13,7 @@ import { Search, LayoutGrid, List, Package } from 'lucide-react';
 
 export default function Collection() {
   const [searchParams] = useSearchParams();
-  const { data: items = [], isLoading } = useCollectionItems();
+  const { data: items = [], isLoading } = useCollectionItems('collection');
   const { data: categories = [] } = useCategories();
   const { allFields } = useCustomFields();
   const itemIds = useMemo(() => items.map(i => i.id), [items]);
@@ -36,7 +36,7 @@ export default function Collection() {
       }
     }
   }, [searchParams, items]);
-  const [statusFilter, setStatusFilter] = useState('all');
+  
   const [sortBy, setSortBy] = useState('created_at');
   const [view, setView] = useState<'grid' | 'list'>('grid');
   const [detailItem, setDetailItem] = useState<any>(null);
@@ -81,7 +81,7 @@ export default function Collection() {
     }
     if (categoryFilter !== 'all') result = result.filter(i => i.category_id === categoryFilter);
     if (conditionFilter !== 'all') result = result.filter(i => i.condition === conditionFilter);
-    if (statusFilter !== 'all') result = result.filter(i => i.status === statusFilter);
+    
 
     // Apply custom field filters
     for (const [fieldId, filterValue] of Object.entries(customFieldFilters)) {
@@ -102,7 +102,7 @@ export default function Collection() {
       }
     });
     return result;
-  }, [items, search, categoryFilter, conditionFilter, statusFilter, sortBy, customFieldFilters, fieldValueMap]);
+  }, [items, search, categoryFilter, conditionFilter, sortBy, customFieldFilters, fieldValueMap]);
 
   const visibleCategories = categories.filter(c => !c.is_hidden);
 
@@ -136,14 +136,6 @@ export default function Collection() {
                 <SelectItem key={c.id} value={c.id}>{c.emoji} {c.name}</SelectItem>
               ))
             )}
-          </SelectContent>
-        </Select>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[150px]"><SelectValue /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Alles</SelectItem>
-            <SelectItem value="collection">In Collectie</SelectItem>
-            <SelectItem value="wishlist">Wishlist</SelectItem>
           </SelectContent>
         </Select>
         <Select value={sortBy} onValueChange={setSortBy}>
