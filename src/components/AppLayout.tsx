@@ -77,13 +77,15 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       </main>
 
       {/* Mobile FAB */}
-      <button
-        onClick={() => setAddOpen(true)}
-        className="fixed md:hidden bottom-20 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors"
-        aria-label="Toevoegen"
-      >
-        <Plus className="h-6 w-6" />
-      </button>
+      {showAddButton && (
+        <button
+          onClick={() => setAddOpen(true)}
+          className="fixed md:hidden bottom-20 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors"
+          aria-label="Toevoegen"
+        >
+          <Plus className="h-6 w-6" />
+        </button>
+      )}
 
       {/* Mobile Bottom Nav */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 flex md:hidden border-t border-border bg-card px-4 pb-[env(safe-area-inset-bottom)]">
