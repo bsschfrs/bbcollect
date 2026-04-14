@@ -1,12 +1,11 @@
 import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { useQueryClient } from '@tanstack/react-query';
 
 export interface Profile {
   id: string;
   user_id: string;
-  display_name: string | null;
+  username: string | null;
   avatar_url: string | null;
   currency: string;
   created_at: string;
@@ -17,8 +16,9 @@ interface ProfileContextType {
   profile: Profile | null;
   loading: boolean;
   currency: string;
-  updateProfile: (updates: Partial<Pick<Profile, 'display_name' | 'avatar_url' | 'currency'>>) => Promise<void>;
+  updateProfile: (updates: Partial<Pick<Profile, 'username' | 'avatar_url' | 'currency'>>) => Promise<void>;
   uploadAvatar: (file: File) => Promise<string>;
+  checkUsernameAvailable: (username: string) => Promise<boolean>;
   refetch: () => Promise<void>;
 }
 
@@ -28,7 +28,6 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-  const queryClient = useQueryClient();
 
   const fetchProfile = useCallback(async () => {
     if (!user) {
@@ -43,15 +42,14 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       .maybeSingle();
 
     if (data) {
-      setProfile(data as Profile);
+      setProfile(data as unknown as Profile);
     } else if (!error || error.code === 'PGRST116') {
-      // Profile doesn't exist yet (e.g. existing user before migration), create it
       const { data: newProfile } = await supabase
         .from('profiles')
         .insert({ user_id: user.id })
         .select()
         .single();
-      if (newProfile) setProfile(newProfile as Profile);
+      if (newProfile) setProfile(newProfile as unknown as Profile);
     }
     setLoading(false);
   }, [user]);
@@ -60,16 +58,16 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     fetchProfile();
   }, [fetchProfile]);
 
-  const updateProfile = async (updates: Partial<Pick<Profile, 'display_name' | 'avatar_url' | 'currency'>>) => {
+  const updateProfile = async (updates: Partial<Pick<Profile, 'username' | 'avatar_url' | 'currency'>>) => {
     if (!user) return;
     const { data, error } = await supabase
       .from('profiles')
-      .update(updates)
+      .update(updates as any)
       .eq('user_id', user.id)
       .select()
       .single();
     if (error) throw error;
-    if (data) setProfile(data as Profile);
+    if (data) setProfile(data as unknown as Profile);
   };
 
   const uploadAvatar = async (file: File): Promise<string> => {
@@ -83,16 +81,23 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     const { data: urlData } = supabase.storage
       .from('collection-images')
       .getPublicUrl(path);
-    // Append cache-buster
     const url = `${urlData.publicUrl}?t=${Date.now()}`;
     await updateProfile({ avatar_url: url });
     return url;
   };
 
+  const checkUsernameAvailable = async (username: string): Promise<boolean> => {
+    const { data, error } = await supabase.rpc('check_username_available', {
+      desired_username: username,
+    });
+    if (error) return false;
+    return data as boolean;
+  };
+
   const currency = profile?.currency ?? '€';
 
   return (
-    <ProfileContext.Provider value={{ profile, loading, currency, updateProfile, uploadAvatar, refetch: fetchProfile }}>
+    <ProfileContext.Provider value={{ profile, loading, currency, updateProfile, uploadAvatar, checkUsernameAvailable, refetch: fetchProfile }}>
       {children}
     </ProfileContext.Provider>
   );

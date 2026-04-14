@@ -197,28 +197,28 @@ export type Database = {
           avatar_url: string | null
           created_at: string
           currency: string
-          display_name: string | null
           id: string
           updated_at: string
           user_id: string
+          username: string | null
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string
           currency?: string
-          display_name?: string | null
           id?: string
           updated_at?: string
           user_id: string
+          username?: string | null
         }
         Update: {
           avatar_url?: string | null
           created_at?: string
           currency?: string
-          display_name?: string | null
           id?: string
           updated_at?: string
           user_id?: string
+          username?: string | null
         }
         Relationships: []
       }
@@ -227,7 +227,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_username_available: {
+        Args: { desired_username: string }
+        Returns: boolean
+      }
     }
     Enums: {
       custom_field_type: "text" | "number" | "dropdown"
