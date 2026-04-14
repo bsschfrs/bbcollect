@@ -1,9 +1,10 @@
 import { ReactNode, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Library, Heart, Plus, Settings, LogOut, Package } from 'lucide-react';
+import { LayoutDashboard, Library, Heart, Plus, Settings, LogOut } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 import ItemFormDialog from '@/components/ItemFormDialog';
+import logo from '@/assets/logo.jpeg';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
