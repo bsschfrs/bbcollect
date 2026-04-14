@@ -52,6 +52,9 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         </button>
       </aside>
 
+      {/* Sidebar spacer for desktop */}
+      <div className="hidden md:block w-64 flex-shrink-0" />
+
       {/* Main Content */}
       <main className="flex-1 pb-20 md:pb-0 overflow-auto">
         <div className="mx-auto max-w-6xl p-4 md:p-8">
