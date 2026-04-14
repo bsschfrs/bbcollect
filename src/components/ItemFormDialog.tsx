@@ -404,6 +404,15 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
     </form>
   );
 
+  const cropperElement = cropperSrc ? (
+    <ImageCropper
+      imageSrc={cropperSrc}
+      open={!!cropperSrc}
+      onClose={() => setCropperSrc(null)}
+      onCropComplete={handleCropComplete}
+    />
+  ) : null;
+
   if (isMobile) {
     return (
       <Drawer open={open} onOpenChange={onOpenChange}>
