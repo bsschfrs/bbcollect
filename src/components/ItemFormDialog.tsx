@@ -33,7 +33,7 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
   const isMobile = useIsMobile();
   const currency = useCurrency();
   const visibleCategories = categories.filter(c => !c.is_hidden);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLFormElement>(null);
 
   const [form, setForm] = useState({
     name: '',
@@ -246,8 +246,8 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
   const hasNoCategories = visibleCategories.length === 0;
   const title = editItem ? 'Item Bewerken' : 'Nieuw Item Toevoegen';
 
-  const formContent = (
-    <form onSubmit={handleSubmit} className="space-y-4 overflow-x-hidden touch-pan-y w-full" style={{ boxSizing: 'border-box' }}>
+  const formFields = (
+    <div className="space-y-4 w-full">
       {/* Image Upload */}
       <div>
         <Label>Foto</Label>
@@ -466,9 +466,14 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
           onFocus={handleInputFocus}
         />
       </div>
+    </div>
+  );
 
-      {/* Actions */}
-      <div className="flex gap-2 pt-2 pb-safe">
+  // Desktop form with inline submit button
+  const desktopFormContent = (
+    <form onSubmit={handleSubmit} className="space-y-4 overflow-x-hidden w-full" style={{ boxSizing: 'border-box' }}>
+      {formFields}
+      <div className="flex gap-2 pt-2">
         <Button type="submit" className="flex-1" disabled={submitting}>
           {submitting ? 'Opslaan...' : editItem ? 'Opslaan' : 'Toevoegen'}
         </Button>
@@ -506,12 +511,14 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
     return (
       <>
         {cropperElement}
-        <Drawer open={open} onOpenChange={onOpenChange} dismissible={false}>
-          <DrawerContent className="h-[100dvh] max-h-[100dvh] w-full max-w-[100vw] overflow-hidden rounded-none touch-pan-y [&>div:first-child]:hidden" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}>
+        {open && (
+          <div
+            className="fixed inset-0 z-50 flex flex-col bg-background overflow-hidden touch-pan-y"
+            style={{ paddingTop: 'env(safe-area-inset-top)' }}
+          >
+            {/* Fixed Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-border shrink-0">
-              <DrawerHeader className="p-0">
-                <DrawerTitle className="text-lg font-semibold">{title}</DrawerTitle>
-              </DrawerHeader>
+              <h2 className="text-lg font-semibold text-foreground">{title}</h2>
               <Button
                 type="button"
                 variant="ghost"
@@ -522,15 +529,48 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
                 <X className="h-5 w-5" />
               </Button>
             </div>
-            <div
-              ref={scrollContainerRef}
-              className="flex-1 overflow-x-hidden overflow-y-auto overscroll-y-contain px-4 py-4 pb-8 touch-pan-y w-full"
+
+            {/* Scrollable Form Content */}
+            <form
+              id="item-form"
+              onSubmit={handleSubmit}
+              className="flex-1 overflow-x-hidden overflow-y-auto overscroll-y-contain touch-pan-y w-full"
               style={{ WebkitOverflowScrolling: 'touch' }}
+              ref={scrollContainerRef}
             >
-              {formContent}
+              <div className="px-4 py-4 pb-4">
+                {formFields}
+              </div>
+            </form>
+
+            {/* Fixed Bottom Action Bar */}
+            <div
+              className="shrink-0 border-t border-border px-4 py-3 bg-background flex gap-2"
+              style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 0.75rem)' }}
+            >
+              <Button type="submit" form="item-form" className="flex-1" disabled={submitting}>
+                {submitting ? 'Opslaan...' : editItem ? 'Opslaan' : 'Toevoegen'}
+              </Button>
+              {editItem && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button type="button" variant="destructive" size="icon"><Trash2 className="h-4 w-4" /></Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Item verwijderen?</AlertDialogTitle>
+                      <AlertDialogDescription>Dit kan niet ongedaan worden gemaakt.</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Annuleren</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleDelete}>Verwijderen</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
             </div>
-          </DrawerContent>
-        </Drawer>
+          </div>
+        )}
       </>
     );
   }
@@ -539,11 +579,11 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
     <>
       {cropperElement}
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-lg max-h-[90vh] max-w-full overflow-x-hidden overflow-y-auto touch-pan-y">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-x-hidden overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
           </DialogHeader>
-          {formContent}
+          {desktopFormContent}
         </DialogContent>
       </Dialog>
     </>
