@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -33,6 +33,7 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
   const isMobile = useIsMobile();
   const currency = useCurrency();
   const visibleCategories = categories.filter(c => !c.is_hidden);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const [form, setForm] = useState({
     name: '',
@@ -107,6 +108,16 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
       setCustomFieldValues({});
     }
   }, [form.category_id]);
+
+  // Scroll focused input into view on mobile to prevent keyboard hiding fields
+  const handleInputFocus = useCallback((e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    if (!isMobile) return;
+    const el = e.target;
+    // Small delay to wait for keyboard to appear
+    setTimeout(() => {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300);
+  }, [isMobile]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -229,7 +240,15 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
       {/* Name */}
       <div>
         <Label htmlFor="name">Naam *</Label>
-        <Input id="name" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} required />
+        <Input
+          id="name"
+          type="text"
+          autoComplete="off"
+          value={form.name}
+          onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+          onFocus={handleInputFocus}
+          required
+        />
       </div>
 
       {/* Category */}
@@ -292,18 +311,44 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label htmlFor="price">Aankoopprijs ({currency})</Label>
-          <Input id="price" type="number" step="0.01" min="0" placeholder="0.00" value={form.purchase_price} onChange={e => setForm(f => ({ ...f, purchase_price: e.target.value }))} />
+          <Input
+            id="price"
+            type="number"
+            inputMode="decimal"
+            step="0.01"
+            min="0"
+            placeholder="0.00"
+            value={form.purchase_price}
+            onChange={e => setForm(f => ({ ...f, purchase_price: e.target.value }))}
+            onFocus={handleInputFocus}
+          />
         </div>
         <div>
           <Label htmlFor="date">Datum verkregen</Label>
-          <Input id="date" type="date" value={form.purchase_date} onChange={e => setForm(f => ({ ...f, purchase_date: e.target.value }))} />
+          <Input
+            id="date"
+            type="date"
+            value={form.purchase_date}
+            onChange={e => setForm(f => ({ ...f, purchase_date: e.target.value }))}
+            onFocus={handleInputFocus}
+          />
         </div>
       </div>
 
       {/* Estimated Value */}
       <div>
         <Label htmlFor="estimated_value">Geschatte waarde ({currency})</Label>
-        <Input id="estimated_value" type="number" step="0.01" min="0" placeholder="0.00" value={form.estimated_value} onChange={e => setForm(f => ({ ...f, estimated_value: e.target.value }))} />
+        <Input
+          id="estimated_value"
+          type="number"
+          inputMode="decimal"
+          step="0.01"
+          min="0"
+          placeholder="0.00"
+          value={form.estimated_value}
+          onChange={e => setForm(f => ({ ...f, estimated_value: e.target.value }))}
+          onFocus={handleInputFocus}
+        />
         {editItem?.value_updated_at && form.estimated_value === editItem.estimated_value?.toString() && (
           <p className="text-[11px] text-muted-foreground mt-1">
             Laatst bijgewerkt: {new Date(editItem.value_updated_at).toLocaleDateString('nl-NL')}
@@ -314,7 +359,15 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
       {/* URL */}
       <div>
         <Label htmlFor="url">Link (URL)</Label>
-        <Input id="url" type="url" placeholder="https://..." value={form.url} onChange={e => setForm(f => ({ ...f, url: e.target.value }))} />
+        <Input
+          id="url"
+          type="url"
+          inputMode="url"
+          placeholder="https://..."
+          value={form.url}
+          onChange={e => setForm(f => ({ ...f, url: e.target.value }))}
+          onFocus={handleInputFocus}
+        />
       </div>
 
       {/* Condition */}
@@ -343,14 +396,17 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
                 <Input
                   value={customFieldValues[field.id] || ''}
                   onChange={e => setCustomFieldValues(v => ({ ...v, [field.id]: e.target.value }))}
+                  onFocus={handleInputFocus}
                   placeholder={field.field_name}
                 />
               )}
               {field.field_type === 'number' && (
                 <Input
                   type="number"
+                  inputMode="decimal"
                   value={customFieldValues[field.id] || ''}
                   onChange={e => setCustomFieldValues(v => ({ ...v, [field.id]: e.target.value }))}
+                  onFocus={handleInputFocus}
                   placeholder="0"
                 />
               )}
@@ -375,11 +431,17 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
       {/* Notes */}
       <div>
         <Label htmlFor="notes">Notities</Label>
-        <Textarea id="notes" placeholder="Persoonlijke notities..." value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
+        <Textarea
+          id="notes"
+          placeholder="Persoonlijke notities..."
+          value={form.notes}
+          onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
+          onFocus={handleInputFocus}
+        />
       </div>
 
       {/* Actions */}
-      <div className="flex gap-2 pt-2">
+      <div className="flex gap-2 pt-2 pb-safe">
         <Button type="submit" className="flex-1" disabled={submitting}>
           {submitting ? 'Opslaan...' : editItem ? 'Opslaan' : 'Toevoegen'}
         </Button>
@@ -417,9 +479,9 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
     return (
       <>
         {cropperElement}
-        <Drawer open={open} onOpenChange={onOpenChange}>
-          <DrawerContent className="h-[100dvh] max-h-[100dvh] rounded-none">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+        <Drawer open={open} onOpenChange={onOpenChange} dismissible={false}>
+          <DrawerContent className="h-[100dvh] max-h-[100dvh] rounded-none [&>div:first-child]:hidden">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border shrink-0">
               <DrawerHeader className="p-0">
                 <DrawerTitle className="text-lg font-semibold">{title}</DrawerTitle>
               </DrawerHeader>
@@ -433,7 +495,11 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
                 <X className="h-5 w-5" />
               </Button>
             </div>
-            <div className="flex-1 overflow-y-auto px-4 py-4 pb-8">
+            <div
+              ref={scrollContainerRef}
+              className="flex-1 overflow-y-auto overscroll-y-contain px-4 py-4 pb-8"
+              style={{ WebkitOverflowScrolling: 'touch' }}
+            >
               {formContent}
             </div>
           </DrawerContent>
