@@ -220,7 +220,7 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
   const title = editItem ? 'Item Bewerken' : 'Nieuw Item Toevoegen';
 
   const formContent = (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4 overflow-x-hidden touch-pan-y max-w-full">
       {/* Image Upload */}
       <div>
         <Label>Foto</Label>
@@ -480,7 +480,7 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
       <>
         {cropperElement}
         <Drawer open={open} onOpenChange={onOpenChange} dismissible={false}>
-          <DrawerContent className="h-[100dvh] max-h-[100dvh] rounded-none [&>div:first-child]:hidden">
+          <DrawerContent className="h-[100dvh] max-h-[100dvh] max-w-full overflow-x-hidden rounded-none touch-pan-y [&>div:first-child]:hidden">
             <div className="flex items-center justify-between px-4 py-3 border-b border-border shrink-0">
               <DrawerHeader className="p-0">
                 <DrawerTitle className="text-lg font-semibold">{title}</DrawerTitle>
@@ -497,7 +497,7 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
             </div>
             <div
               ref={scrollContainerRef}
-              className="flex-1 overflow-y-auto overscroll-y-contain px-4 py-4 pb-8"
+              className="flex-1 overflow-x-hidden overflow-y-auto overscroll-y-contain px-4 py-4 pb-8 touch-pan-y max-w-full"
               style={{ WebkitOverflowScrolling: 'touch' }}
             >
               {formContent}
@@ -512,7 +512,7 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
     <>
       {cropperElement}
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-lg max-h-[90vh] max-w-full overflow-x-hidden overflow-y-auto touch-pan-y">
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
           </DialogHeader>
