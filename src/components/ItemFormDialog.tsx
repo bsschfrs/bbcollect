@@ -109,11 +109,38 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
     }
   }, [form.category_id]);
 
+  // Use visualViewport to smoothly handle keyboard open/close
+  useEffect(() => {
+    if (!isMobile || !open) return;
+    const vv = window.visualViewport;
+    if (!vv) return;
+
+    const onResize = () => {
+      const container = scrollContainerRef.current;
+      if (!container) return;
+      // Adjust scroll container height to match visual viewport
+      const offsetTop = container.getBoundingClientRect().top;
+      const availableHeight = vv.height - offsetTop;
+      container.style.height = `${Math.max(availableHeight, 200)}px`;
+    };
+
+    vv.addEventListener('resize', onResize);
+    vv.addEventListener('scroll', onResize);
+    // Initial call
+    onResize();
+
+    return () => {
+      vv.removeEventListener('resize', onResize);
+      vv.removeEventListener('scroll', onResize);
+      const container = scrollContainerRef.current;
+      if (container) container.style.height = '';
+    };
+  }, [isMobile, open]);
+
   // Scroll focused input into view on mobile to prevent keyboard hiding fields
   const handleInputFocus = useCallback((e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     if (!isMobile) return;
     const el = e.target;
-    // Small delay to wait for keyboard to appear
     setTimeout(() => {
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 300);
@@ -220,7 +247,7 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
   const title = editItem ? 'Item Bewerken' : 'Nieuw Item Toevoegen';
 
   const formContent = (
-    <form onSubmit={handleSubmit} className="space-y-4 overflow-x-hidden touch-pan-y max-w-full">
+    <form onSubmit={handleSubmit} className="space-y-4 overflow-x-hidden touch-pan-y w-full" style={{ boxSizing: 'border-box' }}>
       {/* Image Upload */}
       <div>
         <Label>Foto</Label>
@@ -480,7 +507,7 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
       <>
         {cropperElement}
         <Drawer open={open} onOpenChange={onOpenChange} dismissible={false}>
-          <DrawerContent className="h-[100dvh] max-h-[100dvh] max-w-full overflow-x-hidden rounded-none touch-pan-y [&>div:first-child]:hidden">
+          <DrawerContent className="h-[100dvh] max-h-[100dvh] w-full max-w-[100vw] overflow-hidden rounded-none touch-pan-y [&>div:first-child]:hidden" style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}>
             <div className="flex items-center justify-between px-4 py-3 border-b border-border shrink-0">
               <DrawerHeader className="p-0">
                 <DrawerTitle className="text-lg font-semibold">{title}</DrawerTitle>
@@ -497,7 +524,7 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
             </div>
             <div
               ref={scrollContainerRef}
-              className="flex-1 overflow-x-hidden overflow-y-auto overscroll-y-contain px-4 py-4 pb-8 touch-pan-y max-w-full"
+              className="flex-1 overflow-x-hidden overflow-y-auto overscroll-y-contain px-4 py-4 pb-8 touch-pan-y w-full"
               style={{ WebkitOverflowScrolling: 'touch' }}
             >
               {formContent}
