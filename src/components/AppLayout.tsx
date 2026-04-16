@@ -113,7 +113,8 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       {showAddButton && (
         <button
           onClick={() => setAddOpen(true)}
-          className="fixed md:hidden bottom-20 right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors"
+          className="fixed md:hidden z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors right-4"
+          style={{ bottom: 'calc(env(safe-area-inset-bottom) + 4.5rem)' }}
           aria-label="Toevoegen"
         >
           <Plus className="h-6 w-6" />
