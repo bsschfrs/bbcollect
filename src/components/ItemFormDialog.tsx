@@ -33,7 +33,7 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
   const isMobile = useIsMobile();
   const currency = useCurrency();
   const visibleCategories = categories.filter(c => !c.is_hidden);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLFormElement>(null);
 
   const [form, setForm] = useState({
     name: '',
