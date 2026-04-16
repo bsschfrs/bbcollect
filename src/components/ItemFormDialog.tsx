@@ -246,8 +246,8 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
   const hasNoCategories = visibleCategories.length === 0;
   const title = editItem ? 'Item Bewerken' : 'Nieuw Item Toevoegen';
 
-  const formContent = (
-    <form onSubmit={handleSubmit} className="space-y-4 overflow-x-hidden touch-pan-y w-full" style={{ boxSizing: 'border-box' }}>
+  const formFields = (
+    <div className="space-y-4 w-full">
       {/* Image Upload */}
       <div>
         <Label>Foto</Label>
@@ -466,9 +466,14 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
           onFocus={handleInputFocus}
         />
       </div>
+    </div>
+  );
 
-      {/* Actions */}
-      <div className="flex gap-2 pt-2 pb-safe">
+  // Desktop form with inline submit button
+  const desktopFormContent = (
+    <form onSubmit={handleSubmit} className="space-y-4 overflow-x-hidden w-full" style={{ boxSizing: 'border-box' }}>
+      {formFields}
+      <div className="flex gap-2 pt-2">
         <Button type="submit" className="flex-1" disabled={submitting}>
           {submitting ? 'Opslaan...' : editItem ? 'Opslaan' : 'Toevoegen'}
         </Button>
