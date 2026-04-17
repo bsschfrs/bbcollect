@@ -46,21 +46,6 @@ export default function Collection() {
     setCustomFieldFilters({});
   }, [categoryParam]);
 
-  if (!categoryParam) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold">Mijn Collectie</h1>
-          <p className="text-sm text-muted-foreground">Kies een categorie om te bekijken</p>
-        </div>
-        <CategoryGrid
-          categories={categories.filter(c => !c.is_hidden)}
-          items={items}
-        />
-      </div>
-    );
-  }
-
   const activeCategory = categoryParam === 'all'
     ? null
     : categories.find(c => c.id === categoryParam);
