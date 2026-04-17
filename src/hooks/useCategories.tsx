@@ -35,12 +35,13 @@ export function useCategories() {
   });
 
   const updateCategory = useMutation({
-    mutationFn: async ({ id, name, emoji, is_hidden }: { id: string; name?: string; emoji?: string; is_hidden?: boolean }) => {
-      const { error } = await supabase.from('categories').update({
-        name,
-        emoji,
-        is_hidden,
-      }).eq('id', id);
+    mutationFn: async ({ id, ...rest }: { id: string; name?: string; emoji?: string; is_hidden?: boolean; cover_image_url?: string | null }) => {
+      const payload: Record<string, any> = {};
+      if (rest.name !== undefined) payload.name = rest.name;
+      if (rest.emoji !== undefined) payload.emoji = rest.emoji;
+      if (rest.is_hidden !== undefined) payload.is_hidden = rest.is_hidden;
+      if (rest.cover_image_url !== undefined) payload.cover_image_url = rest.cover_image_url;
+      const { error } = await supabase.from('categories').update(payload).eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['categories'] }),
