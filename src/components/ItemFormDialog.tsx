@@ -513,7 +513,7 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
         {cropperElement}
         {open && (
           <div
-            className="fixed inset-0 z-50 flex flex-col bg-background overflow-hidden touch-pan-y"
+            className="fixed inset-0 z-[60] flex flex-col bg-background overflow-hidden touch-pan-y"
             style={{ paddingTop: 'env(safe-area-inset-top)' }}
           >
             {/* Fixed Header */}
