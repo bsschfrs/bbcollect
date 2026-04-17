@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -520,18 +521,11 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
     return (
       <>
         {cropperElement}
-        {open && (
+        {open && createPortal(
           <div
             className="fixed inset-0 z-[60] flex flex-col bg-background overflow-hidden touch-pan-y"
-            style={{
-              top: 0,
-              paddingTop: 'env(safe-area-inset-top)',
-            }}
+            style={{ paddingTop: 'env(safe-area-inset-top)' }}
           >
-            <div
-              className="fixed top-0 left-0 right-0 bg-background z-[1] pointer-events-none"
-              style={{ height: 'env(safe-area-inset-top)' }}
-            />
             {/* Fixed Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-border shrink-0">
               <h2 className="text-lg font-semibold text-foreground">{title}</h2>
@@ -585,7 +579,8 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
                 </AlertDialog>
               )}
             </div>
-          </div>
+          </div>,
+          document.body
         )}
       </>
     );
