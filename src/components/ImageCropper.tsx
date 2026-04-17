@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import Cropper, { Area } from 'react-easy-crop';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogPortal, DialogOverlay } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { ZoomIn, ZoomOut } from 'lucide-react';
@@ -54,7 +54,9 @@ export default function ImageCropper({ imageSrc, open, onClose, onCropComplete }
 
   return (
     <Dialog open={open} onOpenChange={o => { if (!o) onClose(); }}>
-      <DialogContent className="max-w-md p-0 overflow-hidden gap-0">
+      <DialogPortal>
+        <DialogOverlay className="z-[65]" />
+        <DialogContent className="max-w-md p-0 overflow-hidden gap-0 z-[70]">
         <div className="relative w-full aspect-square bg-black">
           <Cropper
             image={imageSrc}
@@ -90,7 +92,8 @@ export default function ImageCropper({ imageSrc, open, onClose, onCropComplete }
             </Button>
           </div>
         </div>
-      </DialogContent>
+        </DialogContent>
+      </DialogPortal>
     </Dialog>
   );
 }
