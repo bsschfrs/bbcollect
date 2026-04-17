@@ -523,8 +523,15 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
         {open && (
           <div
             className="fixed inset-0 z-[60] flex flex-col bg-background overflow-hidden touch-pan-y"
-            style={{ paddingTop: 'env(safe-area-inset-top)' }}
+            style={{
+              top: 0,
+              paddingTop: 'env(safe-area-inset-top)',
+            }}
           >
+            <div
+              className="fixed top-0 left-0 right-0 bg-background z-[1] pointer-events-none"
+              style={{ height: 'env(safe-area-inset-top)' }}
+            />
             {/* Fixed Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-border shrink-0">
               <h2 className="text-lg font-semibold text-foreground">{title}</h2>
