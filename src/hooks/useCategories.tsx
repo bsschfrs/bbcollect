@@ -41,7 +41,7 @@ export function useCategories() {
       if (rest.emoji !== undefined) payload.emoji = rest.emoji;
       if (rest.is_hidden !== undefined) payload.is_hidden = rest.is_hidden;
       if (rest.cover_image_url !== undefined) payload.cover_image_url = rest.cover_image_url;
-      const { error } = await supabase.from('categories').update(payload).eq('id', id);
+      const { error } = await (supabase.from('categories') as any).update(payload).eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['categories'] }),
