@@ -55,6 +55,7 @@ export type Database = {
           estimated_value: number | null
           id: string
           image_url: string | null
+          is_gift: boolean
           name: string
           notes: string | null
           priority: Database["public"]["Enums"]["wishlist_priority"] | null
@@ -73,6 +74,7 @@ export type Database = {
           estimated_value?: number | null
           id?: string
           image_url?: string | null
+          is_gift?: boolean
           name: string
           notes?: string | null
           priority?: Database["public"]["Enums"]["wishlist_priority"] | null
@@ -91,6 +93,7 @@ export type Database = {
           estimated_value?: number | null
           id?: string
           image_url?: string | null
+          is_gift?: boolean
           name?: string
           notes?: string | null
           priority?: Database["public"]["Enums"]["wishlist_priority"] | null

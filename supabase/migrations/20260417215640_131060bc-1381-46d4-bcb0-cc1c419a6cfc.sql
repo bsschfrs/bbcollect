@@ -1,0 +1,1 @@
+ALTER TABLE public.collection_items ADD COLUMN is_gift boolean NOT NULL DEFAULT false;

@@ -95,12 +95,6 @@ export default function ItemDetailSheet({ item, open, onOpenChange, onEdit, cust
           {/* Prices */}
           <div className="grid grid-cols-2 gap-4">
             <div className="rounded-lg bg-muted/50 p-3">
-              <p className="text-xs text-muted-foreground">Aankoopprijs</p>
-              <p className="text-lg font-bold text-foreground mt-0.5">
-                {item.purchase_price != null ? `${currency}${Number(item.purchase_price).toFixed(2)}` : '—'}
-              </p>
-            </div>
-            <div className="rounded-lg bg-muted/50 p-3">
               <p className="text-xs text-muted-foreground flex items-center gap-1">
                 <TrendingUp className="h-3 w-3" /> Geschatte waarde
               </p>
@@ -112,6 +106,16 @@ export default function ItemDetailSheet({ item, open, onOpenChange, onEdit, cust
                   Bijgewerkt: {formatDate(item.value_updated_at)}
                 </p>
               )}
+            </div>
+            <div className="rounded-lg bg-muted/50 p-3">
+              <p className="text-xs text-muted-foreground">Aanschaf</p>
+              <p className="text-lg font-bold text-foreground mt-0.5">
+                {item.is_gift
+                  ? 'Gekregen'
+                  : item.purchase_price != null
+                    ? `${currency}${Number(item.purchase_price).toFixed(2)}`
+                    : '—'}
+              </p>
             </div>
           </div>
 
