@@ -9,7 +9,8 @@ import ItemDetailSheet from '@/components/ItemDetailSheet';
 import CategoryGrid from '@/components/CategoryGrid';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, LayoutGrid, List, Package, ArrowLeft } from 'lucide-react';
+import { Search, LayoutGrid, List, Package, ArrowLeft, Pencil, Check } from 'lucide-react';
+import CategoryCoverPickerSheet from '@/components/CategoryCoverPickerSheet';
 
 export default function Collection() {
   const [searchParams] = useSearchParams();
@@ -30,6 +31,10 @@ export default function Collection() {
   const [editItem, setEditItem] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [customFieldFilters, setCustomFieldFilters] = useState<Record<string, string>>({});
+  const [overviewEditMode, setOverviewEditMode] = useState(false);
+  const [overviewView, setOverviewView] = useState<'grid' | 'list'>('grid');
+  const [coverPickerOpen, setCoverPickerOpen] = useState(false);
+  const [coverPickerCategory, setCoverPickerCategory] = useState<{ id: string; name: string } | null>(null);
 
   useEffect(() => {
     const detailId = searchParams.get('detail');
@@ -112,13 +117,55 @@ export default function Collection() {
   if (!categoryParam) {
     return (
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold">Mijn Collectie</h1>
-          <p className="text-sm text-muted-foreground">Kies een categorie om te bekijken</p>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-bold">Mijn Collectie</h1>
+            <p className="text-sm text-muted-foreground">Kies een categorie om te bekijken</p>
+          </div>
+          <div className="flex items-center gap-1 text-muted-foreground shrink-0">
+            <button
+              onClick={() => setOverviewView('grid')}
+              className={`p-1.5 rounded-md transition-colors ${overviewView === 'grid' ? 'text-foreground bg-muted' : 'hover:text-foreground'}`}
+              aria-label="Grid weergave"
+            >
+              <LayoutGrid className="h-5 w-5" />
+            </button>
+            <button
+              onClick={() => setOverviewView('list')}
+              className={`p-1.5 rounded-md transition-colors ${overviewView === 'list' ? 'text-foreground bg-muted' : 'hover:text-foreground'}`}
+              aria-label="Lijst weergave"
+            >
+              <List className="h-5 w-5" />
+            </button>
+            <button
+              onClick={() => setOverviewEditMode(m => !m)}
+              className={`p-1.5 rounded-md transition-colors ml-1 ${overviewEditMode ? 'text-primary bg-primary/10' : 'hover:text-foreground'}`}
+              aria-label={overviewEditMode ? 'Klaar met bewerken' : 'Covers bewerken'}
+            >
+              {overviewEditMode ? <Check className="h-5 w-5" /> : <Pencil className="h-5 w-5" />}
+            </button>
+          </div>
         </div>
+
         <CategoryGrid
           categories={categories.filter(c => !c.is_hidden)}
           items={items}
+          view={overviewView}
+          editMode={overviewEditMode}
+          onEditCover={(id, name) => {
+            setCoverPickerCategory({ id, name });
+            setCoverPickerOpen(true);
+          }}
+        />
+
+        <CategoryCoverPickerSheet
+          open={coverPickerOpen}
+          onOpenChange={(o) => {
+            setCoverPickerOpen(o);
+            if (!o) setCoverPickerCategory(null);
+          }}
+          categoryId={coverPickerCategory?.id ?? null}
+          categoryName={coverPickerCategory?.name}
         />
       </div>
     );
