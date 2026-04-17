@@ -1,4 +1,4 @@
-import { Package, ExternalLink, TrendingUp } from 'lucide-react';
+import { Package, ExternalLink } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useCurrency } from '@/hooks/useProfile';
@@ -12,6 +12,7 @@ interface ItemCardProps {
     purchase_price: number | null;
     estimated_value?: number | null;
     value_updated_at?: string | null;
+    is_gift?: boolean;
     url?: string | null;
     condition: string | null;
     status: string;
@@ -62,6 +63,12 @@ function CustomFieldDisplay({ fields, values }: { fields?: CustomField[]; values
 
 export default function ItemCard({ item, view = 'grid', onClick, customFields, customFieldValues }: ItemCardProps) {
   const currency = useCurrency();
+  const purchaseLabel = item.is_gift
+    ? 'Gekregen'
+    : item.purchase_price != null
+      ? `${currency}${item.purchase_price.toFixed(2)}`
+      : '—';
+
   if (view === 'list') {
     return (
       <Card className="card-shadow hover:card-shadow-hover transition-shadow cursor-pointer" onClick={onClick}>
@@ -86,15 +93,12 @@ export default function ItemCard({ item, view = 'grid', onClick, customFields, c
             <CustomFieldDisplay fields={customFields} values={customFieldValues} />
           </div>
           <div className="text-right flex-shrink-0 space-y-0.5">
-            <p className="text-sm font-semibold text-foreground">
-              {item.purchase_price != null ? `${currency}${item.purchase_price.toFixed(2)}` : '—'}
+            <p className="text-sm font-bold text-primary">
+              {item.estimated_value != null ? `${currency}${item.estimated_value.toFixed(2)}` : '—'}
             </p>
-            {item.estimated_value != null && (
-              <p className="text-xs text-primary flex items-center justify-end gap-0.5">
-                <TrendingUp className="h-3 w-3" />
-                {currency}{item.estimated_value.toFixed(2)}
-              </p>
-            )}
+            <p className="text-[11px] text-muted-foreground">
+              Aanschaf: {purchaseLabel}
+            </p>
             {item.condition && (
               <Badge variant="secondary" className="text-[10px] mt-1">{conditionLabels[item.condition] || item.condition}</Badge>
             )}
@@ -128,21 +132,14 @@ export default function ItemCard({ item, view = 'grid', onClick, customFields, c
       <CardContent className="p-3">
         <p className="text-sm font-semibold text-foreground truncate">{item.name}</p>
         <p className="text-xs text-muted-foreground mt-0.5">{item.categories?.emoji} {item.categories?.name}</p>
-        <p className="text-sm font-bold text-primary mt-1">
-          {item.purchase_price != null ? `${currency}${item.purchase_price.toFixed(2)}` : '—'}
+        <p className="text-base font-bold text-primary mt-1">
+          {item.estimated_value != null ? `${currency}${item.estimated_value.toFixed(2)}` : '—'}
         </p>
-        {item.estimated_value != null ? (
-          <div className="mt-0.5">
-            <p className="text-xs text-muted-foreground flex items-center gap-0.5">
-              <TrendingUp className="h-3 w-3 text-primary" />
-              Geschatte waarde: {currency}{item.estimated_value.toFixed(2)}
-            </p>
-            {item.value_updated_at && (
-              <p className="text-[10px] text-muted-foreground/70">Bijgewerkt: {formatDate(item.value_updated_at)}</p>
-            )}
-          </div>
-        ) : (
-          <p className="text-xs text-muted-foreground mt-0.5">Geschatte waarde: —</p>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          Aanschaf: {purchaseLabel}
+        </p>
+        {item.estimated_value != null && item.value_updated_at && (
+          <p className="text-[10px] text-muted-foreground/70">Bijgewerkt: {formatDate(item.value_updated_at)}</p>
         )}
         <CustomFieldDisplay fields={customFields} values={customFieldValues} />
       </CardContent>

@@ -18,6 +18,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useFullscreenOverlay } from '@/hooks/useFullscreenOverlay';
 import { Camera, Trash2, Settings, X } from 'lucide-react';
 import ImageCropper from '@/components/ImageCropper';
+import { Checkbox } from '@/components/ui/checkbox';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 interface ItemFormDialogProps {
@@ -49,6 +50,7 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
     image_url: '',
     url: '',
     estimated_value: '',
+    is_gift: false,
   });
   const [customFieldValues, setCustomFieldValues] = useState<Record<string, string>>({});
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -81,6 +83,7 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
         image_url: editItem.image_url || '',
         url: editItem.url || '',
         estimated_value: editItem.estimated_value?.toString() || '',
+        is_gift: editItem.is_gift || false,
       });
       setImagePreview(editItem.image_url || null);
     } else {
@@ -96,6 +99,7 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
         image_url: '',
         url: '',
         estimated_value: '',
+        is_gift: false,
       });
       setImagePreview(null);
       setCustomFieldValues({});
@@ -189,7 +193,8 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
         name: form.name,
         category_id: form.category_id || null,
         status: form.status as 'collection' | 'wishlist',
-        purchase_price: form.purchase_price ? parseFloat(form.purchase_price) : null,
+        purchase_price: form.is_gift ? 0 : (form.purchase_price ? parseFloat(form.purchase_price) : null),
+        is_gift: form.is_gift,
         purchase_date: form.purchase_date || null,
         condition: (form.condition || null) as any,
         notes: form.notes || null,
@@ -345,31 +350,45 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
       )}
 
       {/* Price & Date Row */}
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="price">Aankoopprijs ({currency})</Label>
-          <Input
-            id="price"
-            type="number"
-            inputMode="decimal"
-            step="0.01"
-            min="0"
-            placeholder="0.00"
-            value={form.purchase_price}
-            onChange={e => setForm(f => ({ ...f, purchase_price: e.target.value }))}
-            onFocus={handleInputFocus}
-          />
+      <div className="space-y-2">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="price">Aankoopprijs ({currency})</Label>
+            <Input
+              id="price"
+              type="number"
+              inputMode="decimal"
+              step="0.01"
+              min="0"
+              placeholder="0.00"
+              value={form.purchase_price}
+              onChange={e => setForm(f => ({ ...f, purchase_price: e.target.value }))}
+              onFocus={handleInputFocus}
+              disabled={form.is_gift}
+              className={form.is_gift ? 'opacity-60' : ''}
+            />
+          </div>
+          <div>
+            <Label htmlFor="date">Datum verkregen</Label>
+            <Input
+              id="date"
+              type="date"
+              value={form.purchase_date}
+              onChange={e => setForm(f => ({ ...f, purchase_date: e.target.value }))}
+              onFocus={handleInputFocus}
+            />
+          </div>
         </div>
-        <div>
-          <Label htmlFor="date">Datum verkregen</Label>
-          <Input
-            id="date"
-            type="date"
-            value={form.purchase_date}
-            onChange={e => setForm(f => ({ ...f, purchase_date: e.target.value }))}
-            onFocus={handleInputFocus}
+        <label className="flex items-center gap-2 cursor-pointer pt-1">
+          <Checkbox
+            id="is_gift"
+            checked={form.is_gift}
+            onCheckedChange={(checked) =>
+              setForm(f => ({ ...f, is_gift: !!checked, purchase_price: checked ? '' : f.purchase_price }))
+            }
           />
-        </div>
+          <span className="text-sm text-foreground">Gekregen (geen aankoopprijs)</span>
+        </label>
       </div>
 
       {/* Estimated Value */}
