@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Library, Heart, Plus, Settings, User } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
+import { useFullscreenOverlay } from '@/hooks/useFullscreenOverlay';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import ItemFormDialog from '@/components/ItemFormDialog';
@@ -21,6 +22,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   const showAddButton = pathname !== '/settings' && pathname !== '/profile';
   const { user } = useAuth();
   const { profile } = useProfile();
+  const { isOpen: overlayOpen } = useFullscreenOverlay();
   const [addOpen, setAddOpen] = useState(false);
 
   const initials = (profile?.username || user?.email || '?')
@@ -89,7 +91,10 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       <div className="hidden md:block w-64 flex-shrink-0" />
 
       {/* Mobile top bar with avatar */}
-      <div className="fixed top-0 left-0 right-0 z-50 flex md:hidden items-center justify-between px-4 py-2 bg-card border-b border-border">
+      <div className={cn(
+        "fixed top-0 left-0 right-0 z-50 flex md:hidden items-center justify-between px-4 py-2 bg-card border-b border-border",
+        overlayOpen && "hidden"
+      )}>
         <div className="flex items-center gap-2">
           <img src={logo} alt="BB Collect logo" className="h-7 w-7 rounded-lg object-cover" />
           <span className="text-sm font-bold text-foreground">BB Collect</span>
@@ -103,7 +108,10 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 pb-20 md:pb-0 overflow-auto pt-14 md:pt-0">
+      <main className={cn(
+        "flex-1 overflow-auto",
+        !overlayOpen && "pb-20 md:pb-0 pt-14 md:pt-0"
+      )}>
         <div className="mx-auto max-w-6xl p-4 md:p-8">
           {children}
         </div>
@@ -113,7 +121,10 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       {showAddButton && (
         <button
           onClick={() => setAddOpen(true)}
-          className="fixed md:hidden z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors right-4"
+          className={cn(
+            "fixed md:hidden z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors right-4",
+            overlayOpen && "hidden"
+          )}
           style={{ bottom: 'calc(env(safe-area-inset-bottom) + 4.5rem)' }}
           aria-label="Toevoegen"
         >
@@ -122,7 +133,10 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       )}
 
       {/* Mobile Bottom Nav */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 flex md:hidden border-t border-border bg-card px-4 pb-[env(safe-area-inset-bottom)]">
+      <nav className={cn(
+        "fixed bottom-0 left-0 right-0 z-50 flex md:hidden border-t border-border bg-card px-4 pb-[env(safe-area-inset-bottom)]",
+        overlayOpen && "hidden"
+      )}>
         {navItems.map(({ to, icon: Icon, label }) => (
           <Link
             key={to}

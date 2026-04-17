@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { ProfileProvider } from "@/hooks/useProfile";
+import { FullscreenOverlayProvider } from "@/hooks/useFullscreenOverlay";
 import AppLayout from "@/components/AppLayout";
 import Auth from "@/pages/Auth";
 import LandingPage from "@/pages/LandingPage";
@@ -46,16 +47,18 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <ProfileProvider>
-            <Routes>
-              <Route path="/auth" element={<AuthRoute />} />
-              <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-              <Route path="/collection" element={<ProtectedRoute><Collection /></ProtectedRoute>} />
-              <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
-              <Route path="/add" element={<ProtectedRoute><AddItem /></ProtectedRoute>} />
-              <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
-              <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <FullscreenOverlayProvider>
+              <Routes>
+                <Route path="/auth" element={<AuthRoute />} />
+                <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                <Route path="/collection" element={<ProtectedRoute><Collection /></ProtectedRoute>} />
+                <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
+                <Route path="/add" element={<ProtectedRoute><AddItem /></ProtectedRoute>} />
+                <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+                <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </FullscreenOverlayProvider>
           </ProfileProvider>
         </AuthProvider>
       </BrowserRouter>

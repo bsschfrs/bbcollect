@@ -14,6 +14,7 @@ import { useCategories } from '@/hooks/useCategories';
 import { useCollectionItems } from '@/hooks/useCollectionItems';
 import { useCustomFields, useCustomFieldValues } from '@/hooks/useCustomFields';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useFullscreenOverlay } from '@/hooks/useFullscreenOverlay';
 import { Camera, Trash2, Settings, X } from 'lucide-react';
 import ImageCropper from '@/components/ImageCropper';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
@@ -53,6 +54,14 @@ export default function ItemFormDialog({ open, onOpenChange, editItem, defaultSt
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [cropperSrc, setCropperSrc] = useState<string | null>(null);
+
+  const { setOpen: setOverlayOpen } = useFullscreenOverlay();
+
+  useEffect(() => {
+    if (!isMobile) return;
+    setOverlayOpen(open);
+    return () => setOverlayOpen(false);
+  }, [open, isMobile, setOverlayOpen]);
 
   const { fields } = useCustomFields(form.category_id || null);
   const { values: existingValues } = useCustomFieldValues(editItem?.id || null);
